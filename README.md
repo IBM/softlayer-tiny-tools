@@ -1,6 +1,6 @@
-# SoftLayer tools
+# SoftLayer tiny tools
 
-一些softlayer 脚本提升运维效率。
+一些轻量级的softlayer 脚本帮助运维提升工作效率。
 
 - [bandwidth_pool](./bandwidth_pools/) 添加数据中心的设备到带宽池
 - [generate_bill](./generate_bill/) 生成账单到PDF，excel， Json 格式，方便集成用户现有运维平台。

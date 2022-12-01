@@ -66,5 +66,18 @@ source env.sh
     - "REFUND" 类型信贷是针对客户的帐户余额及其应收账款的应用。
     - "MANUAL_PAYMENT_CREDIT" 每当客户进行计划外付款时,就会生成发票积分。
 
-# to JSOn
-./get_invoice_to_json.py  -s 11/01/2022 -e 11/30/2022 -t RECURRING > output.json 
+# 获取月初预付费 类型为`RECURRING`的账单
+./month_invoice.py -s 12/01/2021 -e 12/31/2021 -t RECURRING > bill.json 
+
+# month_invoice 获取整月费用
+合并多个账单到一个月账单
+一个月中的账单通常由一下三部分组成
+ - 每个月1日预收取到按月付费机器的类型为`RECURRING`的账单
+ - 月中新下设备的类型为`NEW`的账单
+ - 从备件库里提取设备或升级设备产生的类型为`ONE-TIME-CHARGE`的账单
+由于一个月的实践费用为以上类型的多个账单组成，可以使用下面脚本获取整个月的费用，这个脚本最好在当月中没有新费用产生的时候运行。  
+比如12月15日跑的脚本产生的费用为整个12月的预付费加上14日之前的账单，如果16日从备件库里新提取设备，脚本需要重新跑  
+注意： 目前脚本只能处理从备件库提取的设备产生的ONE-TIME-CHARGE账单，对于升级设备还没有处理，会作为单独项目列出。
+```sh
+ ./month_invoice.py -s 12/01/2021 -e 12/31/2021   -t RECURRING -t NEW -t ONE-TIME-CHARGE > bill.json   
+ ```

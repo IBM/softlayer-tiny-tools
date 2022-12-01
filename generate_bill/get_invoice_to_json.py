@@ -54,7 +54,7 @@ class SL_Service():
         logging.info("开始获取账单")
         #  items[laborAfterTaxAmount, laborFee, laborFeeTaxRate, laborTaxAmount, notes, oneTimeAfterTaxAmount, oneTimeFee, oneTimeFeeTaxRate, oneTimeTaxAmount, parentId, productItemId, recurringAfterTaxAmount, recurringFee, #recurringFeeTaxRate, recurringTaxAmount, resourceTableId, serviceProviderId, setupAfterTaxAmount
         #objectMask = "mask[id, createDate, typeCode, amount, invoiceTotalAmount, invoiceTotalOneTimeAmount, invoiceTotalOneTimeTaxAmount, invoiceTotalPreTaxAmount, invoiceTotalRecurringAmount, invoiceTotalRecurringTaxAmount, payment, startingBalance, endingBalance, items[billingItemId, categoryCode, createDate, description, domainName, hostName, hourlyRecurringFee, id, invoiceId, recurringFeeTaxRate, recurringTaxAmount, resourceTableId, serviceProviderId, setupAfterTaxAmount]]"
-        objectMask = "mask[id, accountId, createDate, typeCode, amount, items[associatedInvoiceItemId, billingItemId, categoryCode, description, domainName, hostName, id, invoiceId, parentId, recurringFee, resourceTableId]]"
+        objectMask = "mask[id, accountId, createDate, typeCode, amount, items[associatedInvoiceItemId, notes, billingItemId, categoryCode, oneTimeFee, description, domainName, hostName, id, invoiceId, parentId, recurringFee, resourceTableId]]"
         objectFilter = {
             'invoices': {
                 'createDate': {
@@ -123,6 +123,8 @@ class SL_Service():
                 "type": item["categoryCode"],
                 "description": item["description"],
                 "fee": float(item["recurringFee"]),
+                "domainName": item["domainName"],
+                "oneTimeFee": item["oneTimeFee"]
                 }
             if item.get("hostName", "") != "":
                 resource["hostName"] = item["hostName"]
@@ -183,14 +185,15 @@ class SL_Service():
             
 if __name__ == "__main__":
     service = SL_Service()
-    devices = service.get_devices()
-    deviceMap = service.check_duplicate(devices)
+    # devices = service.get_devices()
+    # deviceMap = service.check_duplicate(devices)
     invoices = service.get_invoices(start_date, end_date)
-    bill = service.generate_bill(invoices, deviceMap)
-    print(json.dumps(bill, sort_keys=True, indent=2, separators=(',', ': ')))
+    print(json.dumps(invoices, sort_keys=True, indent=2, separators=(',', ': ')))
+    # bill = service.generate_bill(invoices, deviceMap)
+    # print(json.dumps(bill, sort_keys=True, indent=2, separators=(',', ': ')))
 
-    total = 0.0
-    for item in bill["items"]:
-        total += item["fee"]
-    logging.info("原始账单金额为：%s" % bill["amount"])
-    logging.info("合并账单后金额为：%.2f" % total)
+    # total = 0.0
+    # for item in bill["items"]:
+    #     total += item["fee"]
+    # logging.info("原始账单金额为：%s" % bill["amount"])
+    # logging.info("合并账单后金额为：%.2f" % total)
