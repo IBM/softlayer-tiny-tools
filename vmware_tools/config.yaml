@@ -1,0 +1,17 @@
+vm-clone-params:
+  vm_number: 2
+ # vm_template: ct6-sfs-test01
+  vm_template: centos6-template-test
+  datacenter_name: Datacenter-dls09
+  datastorecluster_name: Dallas-storage
+  cluster_name: cok-test01
+  prefix: "cok"
+  private_subnet_id: "1154823"
+  private_if_name: "bond0"
+  public_subnet_id: "1150519"
+  public_if_name: "bond1"
+  dns0: "10.0.80.11"
+  dns1: "10.0.80.12"
+  
+
+
