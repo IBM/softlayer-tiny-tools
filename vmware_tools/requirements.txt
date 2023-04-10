@@ -1,0 +1,8 @@
+#argparse
+pyvmomi>=v7.0.3
+softlayer
+PyYaml
+#requests
+#suds>=0.4,<0.7 ; python_version < '3'
+#suds-jurko ; python_version >= '3.0'
+#vcrpy>=1.1.1
