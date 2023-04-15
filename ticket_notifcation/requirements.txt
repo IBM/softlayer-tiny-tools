@@ -3,5 +3,5 @@ google-auth-httplib2
 google-auth-oauthlib
 ibm_watson
 ibm_cloud_sdk_core
-SoftLayer
+softlayer
 requests
