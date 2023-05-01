@@ -8,3 +8,7 @@ chmod +x clone_vm.py
 clone_vm.py add 
 ## delete VM 
 clone_vm.py delete  vm_name
+
+
+## 虚拟机内存 扩容 2 GB
+./expend_vm_memory.py -i "10.155.206.72"  -m 2
