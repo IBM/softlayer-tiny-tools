@@ -12,3 +12,6 @@ clone_vm.py delete  vm_name
 
 ## 虚拟机内存 扩容 2 GB
 ./expend_vm_memory.py -i "10.155.206.72"  -m 2
+
+## 基于vm 名字扩容
+./expend_vm_memory_v2.py -n "vm-name" -m 2
