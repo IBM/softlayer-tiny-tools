@@ -88,12 +88,13 @@ def main():
                             else:
                                 logging.info("ticket {} : {} is not update".format(ticket_id, ticket_cs_id))
                     else:
-                        logging.info("ticket: {} : {} priority {} less than set priority {}, skip notification".format(ticket_id, ticket_cs_id, ticket_priority, account["priority"]))
+                        logging.info("ticket: {} : {} priority {} less than set priority {}, skip notification".format(ticket_id, ticket_cs_id, ticket_priority, predefined_priority))
             interval = config["mail-check-interval"]
             logging.info("sleep {}...".format(interval))
             time.sleep(interval)
         except Exception as e:
             logging.error(e)
+            raise e
 
 def call_oa(oa, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
     oa_type = oa["oa-type"]
