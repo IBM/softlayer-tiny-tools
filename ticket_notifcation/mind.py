@@ -7,14 +7,14 @@ import logging
 def push_message(endpoint, title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
     logging.info("ding ding send msg for ticket {}".format(cs_ticket_Id))
     post_headers = {'Content-Type': 'application/json'}
-    data = "题目:  {} \n\n".format(title) + \
-           "优先级:  {} \n\n".format(priority) + \
-           "工单号:  {} \n\n".format(cs_ticket_Id) + \
-           "工单跳转:  {} \n\n".format(mail_ticket_link) + \
-           "更新日期:  {} \n\n".format(lastDate) + \
-           "最新更新内容:  {} \n\n".format(entry) + \
+    data = "题目:  {} \\n\\n".format(title) + \
+           "优先级:  {} \\n\\n".format(priority) + \
+           "工单号:  {} \\n\\n".format(cs_ticket_Id) + \
+           "工单跳转:  {} \\n\\n".format(mail_ticket_link) + \
+           "更新日期:  {} \\n\\n".format(lastDate) + \
+           "最新更新内容:  {} \\n\\n".format(entry) + \
            "译文:  {} \n\n".format(entry_translate) + \
-           "翻译由 Ibm watson language translator 提供\n\n" 
+           "翻译由 Ibm watson language translator 提供\\n\\n" 
     message = {
         "text": data
     }
