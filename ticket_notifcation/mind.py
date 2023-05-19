@@ -7,14 +7,13 @@ import logging
 def push_message(endpoint, title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
     logging.info("ding ding send msg for ticket {}".format(cs_ticket_Id))
     post_headers = {'Content-Type': 'application/json'}
-    data = "题目:  {} ".format(title) + r"\n\n" + \
-           "优先级:  {} ".format(priority) + r"\n\n" + \
-           "工单号:  {} ".format(cs_ticket_Id) + r"\n\n" + \
-           "工单跳转:  {} ".format(mail_ticket_link) + r"\n\n" + \
-           "更新日期:  {} ".format(lastDate) + r"\n\n" + \
-           "最新更新内容:  {} ".format(entry) + r"\n\n" + \
-           "译文:  {} ".format(entry_translate) + r"\n\n" + \
-           "翻译由 Ibm watson language translator 提供" + r"\n\n" 
+    data = "**题目:**  {}  \n  ".format(title) + \
+           "**优先级:**  {}  \n  ".format(priority) +  \
+           "**工单号:**  [{}]({})  \n  ".format(cs_ticket_Id, mail_ticket_link) + \
+           "**更新日期:**  {}  \n ".format(lastDate) + \
+           "**最新更新内容:**  \n  {}  \n  ".format(entry) + \
+           "**译文:**  \n  {}  \n  ".format(entry_translate) + \
+           "**备注:** 翻译由 [Ibm watson language translator]({}) 提供 ".format("https://www.ibm.com/cloud/watson-language-translator")
     message = {
         "text": data
     }
