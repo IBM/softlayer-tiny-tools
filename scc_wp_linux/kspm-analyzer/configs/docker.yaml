@@ -1,0 +1,1054 @@
+- id: '1.1.1'
+  name: Partition
+  audit: |
+      docker_root_dir=$(docker info -f '{{`{{ .DockerRootDir }}`}}')
+      if docker info | grep -q userns; then
+        docker_root_dir=$(readlink -f "$docker_root_dir/..")
+      fi
+      echo "$(mountpoint -- "$docker_root_dir")"
+- id: '1.1.2'
+  name: Group members
+  audit: |
+      docker_users=$(grep 'docker' /etc/group)
+      if command -v getent >/dev/null 2>&1; then
+        docker_users=$(getent group docker)
+      fi
+      echo "$(printf "%s" "$docker_users" | awk -F: '{print $4}')"
+- id: '1.1.3'
+  name: Audit docker daemon
+  audit: |
+      file="/usr/bin/dockerd"
+      if [ -e "$file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.4'
+  name: Audit /run/containerd
+  audit: |
+      file="/run/containerd"
+      if [ -e "$file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.5'
+  name: Audit /var/lib/docker
+  audit: |
+      file="/var/lib/docker"
+      if [ -e "$file" ]; then          
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.6'
+  name: Audit /etc/docker
+  audit: |
+      file="/etc/docker"
+      if [ -e "$file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.7'
+  name: Audit docker.service
+  audit: |
+      test_file="/usr/lib/systemd/system/docker.service"
+      if [ -e "/etc/systemd/system/docker.service" ]; then
+        test_file="/etc/systemd/system/docker.service"
+      fi
+      if [ -e "/lib/systemd/system/docker.service" ]; then
+        test_file="/lib/systemd/system/docker.service"
+      fi
+      if systemctl show -p FragmentPath docker.service 2> /dev/null 1>&2; then
+        test_file=$(systemctl show -p FragmentPath docker.service | sed 's/.*=//')
+      fi
+
+      if [ -e "$test_file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep $test_file || true
+        else
+          grep -s "$test_file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.8'
+  name: Audit containerd.sock
+  audit: |
+      test_file="/usr/lib/systemd/system/containerd.sock"
+      if [ -e "/etc/systemd/system/containerd.sock" ]; then
+        test_file="/etc/systemd/system/containerd.sock"
+      fi
+      if [ -e "/lib/systemd/system/containerd.sock" ]; then
+        test_file="/lib/systemd/system/containerd.sock"
+      fi
+      if systemctl show -p FragmentPath containerd.sock 2> /dev/null 1>&2; then
+        test_file=$(systemctl show -p FragmentPath containerd.sock | sed 's/.*=//')
+      fi
+
+      if [ -e "$test_file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep $test_file || true
+        else
+          grep -s "$test_file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.9'
+  name: Audit docker.socket
+  audit: |
+      test_file="/usr/lib/systemd/system/docker.socket"
+      if [ -e "/etc/systemd/system/docker.socket" ]; then
+        test_file="/etc/systemd/system/docker.socket"
+      fi
+      if [ -e "/lib/systemd/system/docker.socket" ]; then
+        test_file="/lib/systemd/system/docker.socket"
+      fi
+      if systemctl show -p FragmentPath docker.socket 2> /dev/null 1>&2; then
+        test_file=$(systemctl show -p FragmentPath docker.socket | sed 's/.*=//')
+      fi
+
+      if [ -e "$test_file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep $test_file || true
+        else
+          grep -s "$test_file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.10'
+  name: Audit /etc/default/docker
+  audit: |
+      file="/etc/default/docker"
+      if [ -e "$file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.11'
+  name: Audit configuration file
+  audit: |
+      file="{{ .ConfigFile }}"
+      if [ -e "$file" ]; then
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.12'
+  name: Audit /etc/containerd/config.toml
+  audit: |
+      if [ -e "$file" ]; then
+        file="/etc/containerd/config.toml"
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.13'
+  name: Audit /etc/sysconfig/docker
+  audit: |
+      if [ -e "$file" ]; then
+        file="/etc/sysconfig/docker"
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.14'
+  name: Audit /usr/bin/containerd
+  audit: |
+      if [ -e "$file" ]; then
+        file="/usr/bin/containerd"
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.15'
+  name: Audit /usr/bin/containerd-shim
+  audit: |
+      if [ -e "$file" ]; then
+        file="/usr/bin/containerd-shim"
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.16'
+  name: Audit /usr/bin/containerd-shim-runc-v1
+  audit: |
+      if [ -e "$file" ]; then
+        file="/usr/bin/containerd-shim-runc-v1"
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.17'
+  name: Audit /usr/bin/containerd-shim-runc-v2
+  audit: |
+      if [ -e "$file" ]; then
+        file="/usr/bin/containerd-shim-runc-v2"
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.1.18'
+  name: Audit /usr/bin/runc
+  audit: |
+      if [ -e "$file" ]; then
+        file="/usr/bin/runc"
+        if command -v auditctl >/dev/null 2>&1; then
+          auditctl -l | grep "$file" || true
+        else
+          grep -s "$file" /host/etc/audit/rules.d/*.rules || true
+        fi
+      fi
+- id: '1.2.2'
+  name: Docker Version
+  audit: |
+      do_version_check() {
+        [ "$1" = "$2" ] && return 10
+
+        ver1front=$(printf "%s" "$1" | cut -d "." -f -1)
+        ver1back=$(printf "%s" "$1" | cut -d "." -f 2-)
+        ver2front=$(printf "%s" "$2" | cut -d "." -f -1)
+        ver2back=$(printf "%s" "$2" | cut -d "." -f 2-)
+
+        if [ "$ver1front" != "$1" ] || [ "$ver2front" != "$2" ]; then
+          [ "$ver1front" -gt "$ver2front" ] && return 11
+          [ "$ver1front" -lt "$ver2front" ] && return 9
+
+          [ "$ver1front" = "$1" ] || [ -z "$ver1back" ] && ver1back=0
+          [ "$ver2front" = "$2" ] || [ -z "$ver2back" ] && ver2back=0
+            do_version_check "$ver1back" "$ver2back"
+            return $?
+        fi
+        [ "$1" -gt "$2" ] && return 11 || return 9
+      }
+
+      docker_version=$(docker version | grep -i -A2 '^server' | grep ' Version:' | awk '{print $NF; exit}' | tr -d '[:alpha:]-,')
+      docker_current_version="$(date +%y.%m.0 -d @$(( $(date +%s) - 2592000)))"
+      
+      do_version_check "$docker_current_version" "$docker_version"        
+      if [ $? -eq 11 ]; then
+        echo "Using $docker_version, verify is it up to date as deemed necessary"
+      else
+        echo "Using $docker_version which is current"
+      fi
+- id: 2.2-5.29
+  name: Docker network
+  audit: |
+      networks=$(docker network ls -q 2>/dev/null)
+      for net in $networks; do
+        echo "$(docker network inspect --format '{{`{{.Name }}`}}: {{`{{ .Options }}`}}' "$net")"
+      done
+- id: '2.3'
+  name: log-level
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep log-level {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep log-level)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep log-level)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.4'
+  name: iptables
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep iptables {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep iptables)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep iptables)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.5'
+  name: insecure registries
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep insecure-registries {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep insecure-registries)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep insecure-registries)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.6'
+  name: Storage Driver
+  audit: 'docker info --format ''Storage Driver: {{`{{ .Driver }}`}}'''
+- id: '2.7'
+  name: TLS Authentication
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep tls {{ .ConfigFile }} | tr -d ",")
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep tls)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep tls)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.8'
+  name: default-ulimit
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep default-ulimit {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep default-ulimit)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep default-ulimit)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: 2.9-2.17
+  name: SecurityOptions
+  audit: docker info --format '{{`{{ .SecurityOptions }}`}}'
+- id: '2.10'
+  name: cgroup-parent
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep cgroup-parent {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep cgroup-parent)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep cgroup-parent)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.11'
+  name: storage-opt
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep storage-opt {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep storage-opt)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep storage-opt)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.12'
+  name: authorization-plugin
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep authorization-plugin {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep authorization-plugin)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep authorization-plugin)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.13'
+  name: log-driver
+  audit: docker info --format '{{`{{ .LoggingDriver }}`}}'
+- id: '2.14'
+  name: no-new-privileges
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep no-new-privileges {{ .ConfigFile }})
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep no-new-privileges)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep no-new-privileges)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.15'
+  name: live-restore
+  audit: |
+      output=$(docker info --format 'LiveRestoreEnabled={{`{{ .LiveRestoreEnabled }}`}}')
+      if [[ ! -z "$output" ]]; then
+        echo "$output"
+      fi
+      if docker info 2>/dev/null | grep -e "Swarm:*\sactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: active"
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep live-restore)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep live-restore)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.16'
+  name: userland-proxy
+  audit: |
+      if [ -e "{{ .ConfigFile }}" ]; then
+        output=$(grep userland-proxy {{ .ConfigFile }} | tr -d ",")
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        fi
+      else
+        output=$(ps -ef | grep dockerd | sed '$d' | grep userland-proxy)
+        if [[ ! -z "$output" ]]; then
+          echo "$output"
+        else
+          output=$(ps -ef | grep "docker daemon" | sed '$d' | grep userland-proxy)
+          if [[ ! -z "$output" ]]; then
+            echo "$output"
+          fi
+        fi
+      fi
+- id: '2.18'
+  name: Experimental
+  audit: docker version --format 'experimental={{`{{ .Server.Experimental }}`}}'
+- id: '3.1'
+  name: File Ownership - docker.service
+  audit: |
+      file="/usr/lib/systemd/system/docker.service"
+      if [ -e "/etc/systemd/system/docker.service" ]; then
+        file="/etc/systemd/system/docker.service"
+      fi
+      if [ -e "/lib/systemd/system/docker.service" ]; then
+        file="/lib/systemd/system/docker.service"
+      fi
+      if systemctl show -p FragmentPath docker.service 2> /dev/null 1>&2; then
+        file=$(systemctl show -p FragmentPath docker.service | sed 's/.*=//')
+      fi
+
+      if [ -e "$file" ]; then
+        stat -c %U:%G "$file"
+      else
+        exit 80
+      fi
+- id: '3.2'
+  name: File Permissions - docker.service
+  audit: |
+      file="/usr/lib/systemd/system/docker.service"
+      if [ -e "/etc/systemd/system/docker.service" ]; then
+        file="/etc/systemd/system/docker.service"
+      fi
+      if [ -e "/lib/systemd/system/docker.service" ]; then
+        file="/lib/systemd/system/docker.service"
+      fi
+      if systemctl show -p FragmentPath docker.service 2> /dev/null 1>&2; then
+        file=$(systemctl show -p FragmentPath docker.service | sed 's/.*=//')
+      fi
+
+      if [ -e "$file" ]; then
+        stat -c %a "$file"
+      else
+        exit 80
+      fi
+- id: '3.3'
+  name: File Ownership - docker.socket
+  audit: |
+      file="/usr/lib/systemd/system/docker.socket"
+      if [ -e "/etc/systemd/system/docker.socket" ]; then
+        file="/etc/systemd/system/docker.socket"
+      fi
+      if [ -e "/lib/systemd/system/docker.socket" ]; then
+        file="/lib/systemd/system/docker.socket"
+      fi
+      if systemctl show -p FragmentPath docker.socket 2> /dev/null 1>&2; then
+        file=$(systemctl show -p FragmentPath docker.socket | sed 's/.*=//')
+      fi
+
+      if [ -e "$file" ]; then
+        stat -c %U:%G "$file"
+      else
+        exit 80
+      fi
+- id: '3.4'
+  name: File Permissions - docker.socket
+  audit: |
+      file="/usr/lib/systemd/system/docker.socket"
+      if [ -e "/etc/systemd/system/docker.socket" ]; then
+        file="/etc/systemd/system/docker.socket"
+      fi
+      if [ -e "/lib/systemd/system/docker.socket" ]; then
+        file="/lib/systemd/system/docker.socket"
+      fi
+      if systemctl show -p FragmentPath docker.socket 2> /dev/null 1>&2; then
+        file=$(systemctl show -p FragmentPath docker.socket | sed 's/.*=//')
+      fi
+
+      if [ -e "$file" ]; then
+        stat -c %a "$file"
+      else
+        exit 80
+      fi
+- id: '3.5'
+  name: Directory Ownership - /etc/docker
+  audit: |
+      directory="/etc/docker"
+      if [ -e "$directory" ]; then
+        stat -c "%U:%G" "$directory"
+      else
+        exit 81
+      fi
+- id: '3.6'
+  name: Directory Permissions - /etc/docker
+  audit: |
+      directory="/etc/docker"
+      if [ -e "$directory" ]; then
+        stat -c %a "$directory"
+      else
+        exit 81
+      fi
+- id: '3.7'
+  name: File Ownership - registry certificate
+  audit: |
+      directory="/etc/docker/certs.d/"
+      if [ -d "$directory" ]; then
+        stat -c "%n %U:%G" /etc/docker/certs.d/*
+      else
+        exit 81
+      fi
+- id: '3.8'
+  name: File Permissions - registry certificate
+  audit: | 
+      directory="/etc/docker/certs.d/"
+      if [ -d "$directory" ]; then
+        stat -c "%n %a" /etc/docker/certs.d/*
+      else
+        exit 81
+      fi
+- id: '3.9'
+  name: File Ownership - TLS CA certificate
+  audit: |
+      tlscacert=$(ps -ef | grep dockerd | sed '$d' | grep 'tlscacert' | sed -n 's/.*tlscacert=\([^s]\)/\1/p' | sed 's/--/ --/g' | cut -d " " -f 1)
+
+      if [ -n "$(grep tlscacert {{ .ConfigFile }})" ]; then
+        tlscacert=$(grep tlscacert {{ .ConfigFile }})
+      fi
+      if [ -e "$tlscacert" ]; then
+        stat -c "%U:%G" "$tlscacert"
+      else
+        exit 80
+      fi
+- id: '3.10'
+  name: File Permissions - TLS CA certificate
+  audit: |
+      tlscacert=$(ps -ef | grep dockerd | sed '$d' | grep 'tlscacert' | sed -n 's/.*tlscacert=\([^s]\)/\1/p' | sed 's/--/ --/g' | cut -d " " -f 1)
+
+      if [ -n "$(grep tlscacert {{ .ConfigFile }})" ]; then
+        tlscacert=$(grep tlscacert {{ .ConfigFile }})
+      fi
+      if [ -e "$tlscacert" ]; then
+        stat -c %a "$tlscacert"
+      else
+        exit 80
+      fi
+- id: '3.11'
+  name: File Ownership - TLS server certificate
+  audit: |
+      tlscert=$(ps -ef | grep dockerd | sed '$d' | grep 'tlscert' | sed -n 's/.*tlscert=\([^s]\)/\1/p' | sed 's/--/ --/g' | cut -d " " -f 1)
+
+      if [ -n "$(grep tlscert {{ .ConfigFile }})" ]; then
+        tlscert=$(grep tlscert {{ .ConfigFile }})
+      fi
+      if [ -e "$tlscert" ]; then
+        stat -c "%U:%G" "$tlscert"
+      else
+        exit 80
+      fi
+- id: '3.12'
+  name: File Permissions - TLS server certificate
+  audit: |
+      tlscert=$(ps -ef | grep dockerd | sed '$d' | grep 'tlscert' | sed -n 's/.*tlscert=\([^s]\)/\1/p' | sed 's/--/ --/g' | cut -d " " -f 1)
+
+      if [ -n "$(grep tlscert {{ .ConfigFile }})" ]; then
+        tlscert=$(grep tlscert {{ .ConfigFile }})
+      fi
+      if [ -e "$tlscert" ]; then
+        stat -c %a "$tlscert"
+      else
+        exit 80
+      fi
+- id: '3.13'
+  name: File Ownership - TLS server certificate key
+  audit: |
+      tlskey=$(ps -ef | grep dockerd | sed '$d' | grep 'tlskey' | sed -n 's/.*tlskey=\([^s]\)/\1/p' | sed 's/--/ --/g' | cut -d " " -f 1)
+
+      if [ -n "$(grep tlskey {{ .ConfigFile }})" ]; then
+        tlskey=$(grep tlskey {{ .ConfigFile }})
+      fi
+      if [ -e "$tlskey" ]; then
+        stat -c "%U:%G" "$tlskey"
+      else
+        exit 80
+      fi
+- id: '3.14'
+  name: File Permissions - TLS server certificate key
+  audit: |
+      tlskey=$(ps -ef | grep dockerd | sed '$d' | grep 'tlskey' | sed -n 's/.*tlskey=\([^s]\)/\1/p' | sed 's/--/ --/g' | cut -d " " -f 1)
+
+      if [ -n "$(grep tlskey {{ .ConfigFile }})" ]; then
+        tlskey=$(grep tlskey {{ .ConfigFile }})
+      fi
+      if [ -e "$tlskey" ]; then
+        stat -c %a "$tlskey"
+      else
+        exit 80
+      fi
+- id: '3.15'
+  name: File Ownership - Docker socket
+  audit: |
+      file="/var/run/docker.sock"
+      if [ -e "$file" ]; then
+        stat -c "%U:%G" "$file"
+      else
+        exit 80
+      fi
+- id: '3.16'
+  name: File Permissions - Docker socket
+  audit: |
+      file="/var/run/docker.sock"
+      if [ -e "$file" ]; then
+        stat -c %a "$file"
+      else
+        exit 80
+      fi
+- id: '3.17'
+  name: File Ownership - daemon.json
+  audit: |
+      file="{{ .ConfigFile }}"
+      if [ -e "$file" ]; then
+        stat -c "%U:%G" "$file"
+      else
+        exit 80
+      fi
+- id: '3.18'
+  name: File Permissions - daemon.json
+  audit: |
+      file="{{ .ConfigFile }}"
+      if [ -e "$file" ]; then
+        stat -c %a "$file"
+      else
+        exit 80
+      fi
+- id: '3.19'
+  name: File Ownership - /etc/default/docker
+  audit: |
+      file="/etc/default/docker"
+      if [ -e "$file" ]; then
+        stat -c "%U:%G" "$file"
+      else
+        exit 80
+      fi
+- id: '3.20'
+  name: File Permissions - /etc/sysconfig/docker
+  audit: |
+      file="/etc/sysconfig/docker"
+      if [ -e "$file" ]; then
+        stat -c %a "$file"
+      else
+        exit 80
+      fi
+- id: '3.21'
+  name: File Ownership - /etc/sysconfig/docker
+  audit: |
+      file="/etc/sysconfig/docker"
+      if [ -e "$file" ]; then
+        stat -c "%U:%G" "$file"
+      else
+        exit 80
+      fi
+- id: '3.22'
+  name: File Permissions - /etc/default/docker
+  audit: |
+      file="/etc/default/docker"
+      if [ -e "$file" ]; then
+        stat -c %a "$file"
+      else
+        exit 80
+      fi
+- id: '3.23'
+  name: File Ownership - Containerd socket
+  audit: |
+      file="/run/containerd/containerd.sock"
+      if [ -e "$file" ]; then
+        stat -c "%U:%G" "$file"
+      else
+        exit 80
+      fi
+- id: '3.24'
+  name: File Permissions - Containerd socket
+  audit: |
+      file="/run/containerd/containerd.sock"
+      if [ -e "$file" ]; then
+        stat -c %a "$file"
+      else
+        exit 80
+      fi
+- id: '4.1'
+  name: Containers - Users
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{.Id}}`}} - User={{`{{.Config.User}}`}}' "$c")"
+      done
+- id: '4.5'
+  name: DOCKER_CONTENT_TRUST
+  audit: echo DOCKER_CONTENT_TRUST=$DOCKER_CONTENT_TRUST
+- id: '4.6'
+  name: Images HEALTHCHECK
+  audit: |
+      images=`docker images --quiet`
+      for img in $images; do
+        echo "$(docker inspect --format='{{`{{.ID}}`}} RepoTags:{{`{{.RepoTags}}`}} - Healthcheck:{{`{{.Config.Healthcheck}}`}}' "$img")"
+      done
+- id: '4.7'
+  name: Images with update instructions
+  audit: |
+      images=`docker images --quiet`
+      for img in $images; do
+        if docker history "$img" 2>/dev/null | grep -e "update" >/dev/null 2>&1; then
+          imgName=$(docker inspect --format='{{`{{.RepoTags}}`}}' "$img" 2>/dev/null)
+          if ! [ "$imgName" = '[]' ]; then
+            echo "$imgName"
+          fi
+        fi
+      done
+- id: '4.9'
+  name: Images using Add
+  audit: |
+      images=`docker images --quiet`
+      for img in $images; do
+        if docker history --format "{{`{{ .CreatedBy }}`}}" --no-trunc "$img" | sed '$d' | grep -q 'ADD'; then
+          imgName=$(docker inspect --format='{{`{{.RepoTags}}`}}' "$img")
+          if ! [ "$imgName" = '[]' ]; then
+            echo "$imgName"
+          fi
+        fi
+      done
+- id: '5.1'
+  name: Containers - AppArmorProfile
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{.Name}}`}} - AppArmorProfile={{`{{ .AppArmorProfile }}`}}' "$c")"
+      done
+- id: 5.2-5.21-5.25
+  name: Containers - SecurityOpt
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{.Name}}`}} - SecurityOpt={{`{{ .HostConfig.SecurityOpt }}`}}' "$c")"
+      done
+- id: '5.3'
+  name: Containers - CapAdd
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{.Name}}`}} - CapAdd={{`{{ .HostConfig.CapAdd}}`}}' "$c" | sed 's/CAPADD/CapAdd/' | sed -r "s/AUDIT_WRITE|CHOWN|DAC_OVERRIDE|FOWNER|FSETID|KILL|MKNOD|NET_BIND_SERVICE|NET_RAW|SETFCAP|SETGID|SETPCAP|SETUID|SYS_CHROOT|\s//g")"
+      done
+- id: '5.4'
+  name: Containers - Privileged
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Name }}`}} - Privileged={{`{{ .HostConfig.Privileged }}`}}' "$c")"
+      done
+- id: 5.5-5.31
+  name: Containers - Volumes
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Name }}`}} - Volumes={{`{{ .Mounts }}`}}' "$c")"
+      done
+- id: '5.6'
+  name: Containers - Running sshd
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        processes=$(docker exec "$c" ps -el 2>/dev/null | grep -c sshd | awk '{print $1}')
+        if [ "$processes" -ge 1 ]; then
+          echo "$c"
+        else
+          exec_check=$(docker exec "$c" ps -el 2>/dev/null)
+          if [ $? -eq 255 ]; then
+            echo "$c"
+          fi
+        fi
+      done
+- id: 5.7-5.8
+  name: Containers - Mapped Ports
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        ports=$(docker port "$c" | awk '{print $0}' | cut -d ':' -f2)
+        for port in $ports; do
+          if [ -n "$port" ]; then
+            echo "$c - $port"
+          fi
+        done
+      done
+- id: '5.9'
+  name: Containers - NetworkMode
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - NetworkMode={{`{{ .HostConfig.NetworkMode }}`}}' "$c")"
+      done
+- id: '5.10'
+  name: Containers - Memory
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - Memory={{`{{ .HostConfig.Memory }}`}}' "$c")"
+      done
+- id: '5.11'
+  name: Containers - CpuShares
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - CpuShares={{`{{ .HostConfig.CpuShares }}`}}' "$c")"
+      done
+- id: '5.12'
+  name: Containers - ReadonlyRootfs
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - ReadonlyRootfs={{`{{ .HostConfig.ReadonlyRootfs }}`}}' "$c")"
+      done
+- id: '5.13'
+  name: Containers - NetworkSettings.Ports
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - Ports={{`{{ .NetworkSettings.Ports }}`}}' "$c")"
+      done
+- id: '5.14'
+  name: Containers - RestartPolicy.MaximumRetryCount
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - MaximumRetryCount={{`{{ .HostConfig.RestartPolicy.MaximumRetryCount }}`}}' "$c")"
+      done
+- id: '5.15'
+  name: Containers - PidMode
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - PidMode={{`{{ .HostConfig.PidMode }}`}}' "$c")"
+      done
+- id: '5.16'
+  name: Containers - IpcMode
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - IpcMode={{`{{ .HostConfig.IpcMode }}`}}' "$c")"
+      done
+- id: '5.17'
+  name: Containers - Devices
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - Devices={{`{{ .HostConfig.Devices }}`}}' "$c")"
+      done
+- id: '5.18'
+  name: Containers - Ulimits
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - Ulimits={{`{{ .HostConfig.Ulimits  }}`}}' "$c")"
+      done
+- id: '5.19'
+  name: Containers - Mount Propagation
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - Propagation={{`{{range $mnt := .Mounts}}`}} {{`{{json $mnt.Propagation}}`}} {{`{{end}}`}}' "$c")"
+      done
+- id: '5.20'
+  name: Containers - UTSMode
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - UTSMode={{`{{ .HostConfig.UTSMode }}`}}' "$c")"
+      done
+- id: '5.24'
+  name: Containers - CgroupParent
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - CgroupParent={{`{{ .HostConfig.CgroupParent }}`}}' "$c")"
+      done
+- id: '5.26'
+  name: Containers - runtime health checks
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        if ! docker inspect --format '{{`{{ .Id }}`}}: Health={{`{{ .State.Health.Status }}`}}' "$c" 2>/dev/null 1>&2; then
+          echo "$c - Health=false"
+        else
+          echo "$c - Health=true"
+        fi
+      done
+- id: '5.28'
+  name: Containers - PidsLimit
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - PidsLimit={{`{{ .HostConfig.PidsLimit }}`}}' "$c")"
+      done
+- id: '5.30'
+  name: Containers - UsernsMode
+  audit: |
+      containers=`docker ps --quiet`
+      for c in $containers; do
+        echo "$(docker inspect --format '{{`{{ .Id }}`}} - UsernsMode={{`{{ .HostConfig.UsernsMode }}`}}' "$c")"
+      done
+- id: 7.1-7.7-7.9-7.10
+  name: Swarm - Status
+  audit: |
+      if docker info 2>/dev/null | grep -e "Swarm:*\sactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: active"
+      else
+        echo "Swarm: inactive"
+      fi
+- id: '7.2'
+  name: Swarm - Manager Node
+  audit: |
+      if docker info 2>/dev/null | grep -e "Swarm:*\sinactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: inactive"
+      else
+        docker node ls | grep -c "Leader"
+      fi
+- id: '7.3'
+  name: Swarm - Swarm Services
+  audit: |
+      if docker info 2>/dev/null | grep -e "Swarm:*\sinactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: inactive"
+      elif command -v ss >/dev/null 2>&1; then
+        echo "$(ss -lp | grep -iE ':2377|:7946')"
+      elif command -v netstat >/dev/null 2>&1; then
+        echo "$(netstat -lp | grep -iE ':2377|:7946')"
+      else
+        echo "ss or netstat command not found."
+      fi
+- id: '7.4'
+  name: Swarm - Overlay Networks
+  audit: |
+      if docker info 2>/dev/null | grep -e "Swarm:*\sinactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: inactive"
+      else
+        for encnet in $(docker network ls --filter driver=overlay --quiet); do
+          echo "$(docker network inspect --format '{{`{{.Name}}`}} {{`{{ .Options }}`}}' "$encnet")"
+        done
+      fi
+- id: '7.5'
+  name: Swarm - Number of Secrets
+  audit: |
+      if docker info 2>/dev/null | grep -e "Swarm:*\sinactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: inactive"
+      else
+        docker secret ls -q | wc -l
+      fi
+- id: '7.6'
+  name: Swarm - unlock-key
+  audit: |
+      if docker info 2>/dev/null | grep -e "Swarm:*\sinactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: inactive"
+      else
+        docker info --format '{{`{{ .Swarm.Cluster.Spec.EncryptionConfig.AutoLockManagers }}`}}'
+      fi
+- id: '7.8'
+  name: Swarm - Expiry Duration
+  audit: |
+      if docker info 2>/dev/null | grep -e "Swarm:*\sinactive\s*" >/dev/null 2>&1; then
+        echo "Swarm: inactive"
+      else
+        docker info | grep "Expiry Duration:" | awk '{$1=$1};1'
+      fi
+- id: '4.12-docker'
+  name: Unsigned Artifacts
+  attributeId: '4.12-docker'
+  audit: |
+      images=`docker images --format json | jq '.Repository' | tr -d '"' | tr '\n' ' '`
+      for image in $images;
+      do
+        docker trust inspect $image 2>&1 | grep 'no signatures or cannot access' | sed 's/no signatures or cannot access //g'
+      done
+      

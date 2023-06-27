@@ -1,0 +1,680 @@
+- id: 1.1.1
+  attributeId: 1.1.1
+  name: File permissions - API server pod spec
+  component: apiserver
+  audit: /bin/sh -c 'if test -e {{ .apiserver_config }}; then stat -c %a {{ .apiserver_config }}; else exit 80; fi'
+- id: 1.1.2
+  attributeId: 1.1.2
+  name: File ownership - API server pod spec
+  component: apiserver
+  audit: /bin/sh -c 'if test -e {{ .apiserver_config }}; then stat -c %U:%G {{ .apiserver_config }}; else exit 80; fi'
+- id: 1.1.3
+  attributeId: 1.1.3
+  name: File permissions - Controller manager pod spec
+  component: controllermanager
+  audit: /bin/sh -c 'if test -e {{ .controllermanager_config }}; then stat -c %a {{ .controllermanager_config }}; else exit 80; fi'
+- id: 1.1.4
+  attributeId: 1.1.4
+  name: File ownership - Controller manager pod spec
+  component: controllermanager
+  audit: /bin/sh -c 'if test -e {{ .controllermanager_config }}; then stat -c %U:%G {{ .controllermanager_config }}; else exit 80; fi'
+- id: 1.1.5
+  attributeId: 1.1.5
+  name: File permissions - Scheduler pod spec
+  component: scheduler
+  audit: /bin/sh -c 'if test -e {{ .scheduler_config }}; then stat -c %a {{ .scheduler_config }}; else exit 80; fi'
+- id: 1.1.6
+  attributeId: 1.1.6
+  name: File ownership - Scheduler pod spec
+  component: scheduler
+  audit: /bin/sh -c 'if test -e {{ .scheduler_config }}; then stat -c %U:%G {{ .scheduler_config }}; else exit 80; fi'
+- id: 1.1.7
+  attributeId: 1.1.7
+  name: File permissions - Etcd pod spec
+  component: etcd
+  audit: /bin/sh -c 'if test -e {{ .etcd_config }}; then stat -c %a {{ .etcd_config }}; else exit 80; fi'
+- id: 1.1.8
+  attributeId: 1.1.8
+  name: File ownership - Etcd pod spec
+  component: etcd
+  audit: /bin/sh -c 'if test -e {{ .etcd_config }}; then stat -c %U:%G {{ .etcd_config }}; else exit 80; fi'
+- id: 1.1.9
+  attributeId: 1.1.9
+  name: File permissions - Container network interface
+  component: etcd
+  audit: |
+    CNIDIR=$(ps -ef | grep -v {{ .apiserver_bin }} | grep -- --cni-conf-dir= | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%')
+    if test -z $CNIDIR; then CNIDIR=/etc/cni/net.d; fi
+    if test -e $CNIDIR; then ls $CNIDIR/*.* | xargs stat -c '"%n":%a' | paste -sd "," - | sed 's/.*/{&}/'; else exit 80; fi
+- id: 1.1.10
+  attributeId: 1.1.10
+  name: File ownership - Container network interface
+  component: etcd
+  audit: |
+    CNIDIR=$(ps -ef | grep -v {{ .apiserver_bin }} | grep -- --cni-conf-dir= | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%')
+    if test -z $CNIDIR; then CNIDIR=/etc/cni/net.d; fi
+    if test -e $CNIDIR; then ls $CNIDIR/*.* | xargs stat -c '"%n":"%U:%G"' | paste -sd "," - | sed 's/.*/{&}/'; else exit 80; fi
+- id: 1.1.11
+  attributeId: 1.1.11
+  name: Etcd data directory permissions
+  component: etcd
+  audit: ps -ef | grep {{ .etcd_bin}} | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | stat -c %a -
+- id: 1.1.12
+  attributeId: 1.1.12
+  name: Etcd data directory ownership
+  component: etcd
+  audit: ps -ef | grep {{ .etcd_bin}} | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | stat -c %U:%G -
+- id: 1.1.13
+  attributeId: 1.1.13
+  name: File permissions - Administrator config
+  component: master
+  audit: /bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %a /etc/kubernetes/admin.conf; else exit 80; fi'
+- id: 1.1.14
+  attributeId: 1.1.14
+  name: File ownership - Administrator config
+  component: master
+  audit: /bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %U:%G /etc/kubernetes/admin.conf; else exit 80; fi'
+- id: 1.1.15
+  attributeId: 1.1.15
+  name: File permissions - Scheduler config
+  component: scheduler
+  audit: /bin/sh -c 'if test -e {{ .scheduler_kubeconfig }}; then stat -c %a {{ .scheduler_kubeconfig }}; else exit 80; fi'
+- id: 1.1.16
+  attributeId: 1.1.16
+  name: File ownership - Scheduler config
+  component: scheduler
+  audit: /bin/sh -c 'if test -e {{ .scheduler_kubeconfig }}; then stat -c %U:%G {{ .scheduler_kubeconfig }}; else exit 80; fi'
+- id: 1.1.17
+  attributeId: 1.1.17
+  name: File permissions - Controller manager config
+  component: controllermanager
+  audit: /bin/sh -c 'if test -e {{ .controllermanager_kubeconfig }}; then stat -c %a {{ .controllermanager_kubeconfig }}; else exit 80; fi'
+- id: 1.1.18
+  attributeId: 1.1.18
+  name: File ownership - Controller manager config
+  component: controllermanager
+  audit: /bin/sh -c 'if test -e {{ .controllermanager_kubeconfig }}; then stat -c %U:%G {{ .controllermanager_kubeconfig }}; else exit 80; fi'
+- id: 1.1.19
+  attributeId: 1.1.19
+  name: Ownership - Kubernetes PKI
+  component: master
+  audit: /bin/sh -c 'if test -e /etc/kubernetes/pki/; then find /etc/kubernetes/pki/ | xargs stat -c %U:%G; else exit 80; fi'
+- id: 1.1.20
+  attributeId: 1.1.20
+  name: File permissions - Kubernetes PKI certificate
+  component: master
+  audit: /bin/sh -c 'if test -e /etc/kubernetes/pki; then find /etc/kubernetes/pki -name '*.crt' | xargs stat -c '"%n":%a' | paste -sd "," - | sed "s/.*/{&}/"; else exit 80; fi'
+- id: 1.1.21
+  attributeId: 1.1.21
+  name: File permissions - Kubernetes PKI key
+  component: master
+  audit: /bin/sh -c 'if test -e /etc/kubernetes/pki; then find /etc/kubernetes/pki -name '*.key' | xargs stat -c '"%n":%a' | paste -sd "," - | sed "s/.*/{&}/"; else exit 80; fi'
+- id: 1.2.1
+  attributeId: 1.2.1
+  name: API Server --anonymous-auth
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --anonymous-auth | sed 's%.*anonymous-auth[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --anonymous-auth | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.2
+  attributeId: 1.2.2
+  name: API Server --basic-auth-file
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --basic-auth-file | sed 's%.*basic-auth-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --basic-auth-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.3
+  attributeId: 1.2.3
+  name: API Server --token-auth-file
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --token-auth-file | sed 's%.*token-auth-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --token-auth-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.4
+  attributeId: 1.2.4
+  name: API Server --kubelet-https
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --kubelet-https | sed 's%.*kubelet-https[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --kubelet-https | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.5
+  attributeId: 1.2.5
+  name: API Server --kubelet-client-certificate & --kubelet-client-key
+  component: apiserver
+  audit: |
+    CERT=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --kubelet-client-certificate | sed 's%.*kubelet-client-certificate[= ]\([^ ]*\).*%\1%')
+    if test -z $CERT; then CERT=$(cat {{ .apiserver_config }} | grep -- --kubelet-client-certificate | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$CERT" == "null" ]; then CERT=''; fi
+
+    KEY=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --kubelet-client-key | sed 's%.*kubelet-client-key[= ]\([^ ]*\).*%\1%')
+    if test -z $KEY; then KEY=$(cat {{ .apiserver_config }} | grep -- --kubelet-client-key | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$KEY" == "null" ]; then KEY=''; fi
+    echo $CERT
+    echo $KEY
+- id: 1.2.6
+  attributeId: 1.2.6
+  name: API Server --kubelet-certificate-authority
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --kubelet-certificate-authority | sed 's%.*kubelet-certificate-authority[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --kubelet-certificate-authority | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.7-9
+  attributeId: 1.2.7-9
+  name: API Server --authorization-mode
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --authorization-mode | sed 's%.*authorization-mode[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --authorization-mode | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.10-13,16,17
+  attributeId: 1.2.10-13,16,17
+  name: API Server --enable-admission-plugins
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --enable-admission-plugins | sed 's%.*enable-admission-plugins[= ]\([^]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --enable-admission-plugins | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.14-15
+  attributeId: 1.2.14-15
+  name: API Server --disable-admission-plugins
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --disable-admission-plugins | sed 's%.*disable-admission-plugins[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --disable-admission-plugins | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.18
+  attributeId: 1.2.18
+  name: API Server --insecure-bind-address
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --insecure-bind-address | sed 's%.*insecure-bind-address[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --insecure-bind-address | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.19
+  attributeId: 1.2.19
+  name: API Server --insecure-port
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --insecure-port | sed 's%.*insecure-port[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --insecure-port | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.20
+  attributeId: 1.2.20
+  name: API Server --secure-port
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --secure-port | sed 's%.*secure-port[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --secure-port | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.21
+  attributeId: 1.2.21
+  name: API Server --profiling
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --profiling | sed 's%.*profiling[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --profiling | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.22
+  attributeId: 1.2.22
+  name: API Server --audit-log-path
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --audit-log-path | sed 's%.*audit-log-path[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --audit-log-path | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.23
+  attributeId: 1.2.23
+  name: API Server --audit-log-maxage
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --audit-log-maxage | sed 's%.*audit-log-maxage[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --audit-log-maxage | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.24
+  attributeId: 1.2.24
+  name: API Server --audit-log-maxbackup
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --audit-log-maxbackup | sed 's%.*audit-log-maxbackup[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --audit-log-maxbackup | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.25
+  attributeId: 1.2.25
+  name: API Server --audit-log-maxsize
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --audit-log-maxsize | sed 's%.*audit-log-maxsize[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --audit-log-maxsize | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.26
+  attributeId: 1.2.26
+  name: API Server --request-timeout
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --request-timeout | sed 's%.*request-timeout[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --request-timeout | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.27
+  attributeId: 1.2.27
+  name: API Server --service-account-lookup
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --service-account-lookup | sed 's%.*service-account-lookup[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --service-account-lookup | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.28
+  attributeId: 1.2.28
+  name: API Server --service-account-key-file
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --service-account-key-file | sed 's%.*service-account-key-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --service-account-key-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.29
+  attributeId: 1.2.29
+  name: API Server --etcd-certfile & --etcd-keyfile
+  component: apiserver
+  audit: |
+    CERT=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --etcd-certfile | sed 's%.*etcd-certfile[= ]\([^ ]*\).*%\1%')
+    if test -z $CERT; then CERT=$(cat {{ .apiserver_config }} | grep -- --etcd-certfile | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$CERT" == "null" ]; then CERT=''; fi
+
+    KEY=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --etcd-keyfile | sed 's%.*etcd-keyfile[= ]\([^ ]*\).*%\1%')
+    if test -z $KEY; then KEY=$(cat {{ .apiserver_config }} | grep -- --etcd-keyfile | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$KEY" == "null" ]; then KEY=''; fi
+
+    echo $CERT
+    echo $KEY
+- id: 1.2.30
+  attributeId: 1.2.30
+  name: API Server --tls-cert-file & --tls-private-key-file
+  component: apiserver
+  audit: |
+    CERT=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --tls-cert-file | sed 's%.*tls-cert-file[= ]\([^ ]*\).*%\1%')
+    if test -z $CERT; then CERT=$(cat {{ .apiserver_config }} | grep -- --tls-cert-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$CERT" == "null" ]; then CERT=''; fi
+
+    KEY=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --tls-private-key-file | sed 's%.*tls-private-key-file[= ]\([^ ]*\).*%\1%')
+    if test -z $KEY; then KEY=$(cat {{ .apiserver_config }} | grep -- --tls-private-key-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$KEY" == "null" ]; then KEY=''; fi
+
+    echo $CERT
+    echo $KEY
+- id: 1.2.31
+  attributeId: 1.2.31
+  name: API Server --client-ca-file
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --client-ca-file | sed 's%.*client-ca-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --client-ca-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.32
+  attributeId: 1.2.32
+  name: API Server --etcd-cafile
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --etcd-cafile | sed 's%.*etcd-cafile[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --etcd-cafile | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.2.33
+  attributeId: 1.2.33
+  name: API Server --encryption-provider-config
+  component: apiserver
+  audit: |
+    CFGFILE=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --encryption-provider-config | sed 's%.*encryption-provider-config[= ]\([^ ]*\).*%\1%')
+    if test -z $CFGFILE; then exit 0; fi
+    if test -e $CFGFILE; then cat $CFGFILE yq e '.resources[].resources[]' - | grep -v '^ .*' | sed 's/:.*$//' | paste -sd "," -; fi
+- id: 1.2.34
+  attributeId: 1.2.34
+  name: API Server encryption providers
+  component: apiserver
+  audit: |
+    CFGFILE=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --encryption-provider-config | sed 's%.*encryption-provider-config[= ]\([^ ]*\).*%\1%')
+    if test -z $CFGFILE; then exit 0; fi
+    if test -e $CFGFILE; then cat $CFGFILE yq e '.resources[].providers[]' - | grep -v '^ .*' | sed 's/:.*$//' | paste -sd "," -; fi
+- id: 1.2.35
+  attributeId: 1.2.35
+  name: API Server --tls-cipher-suites
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --tls-cipher-suites | sed 's%.*tls-cipher-suites[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --tls-cipher-suites | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.3.1
+  attributeId: 1.3.1
+  name: Controller Manager --terminated-pod-gc-threshold
+  component: controllermanager
+  audit: |
+    VAL=$(ps -ef | grep {{ .controllermanager_bin }} | grep -- --terminated-pod-gc-threshold | sed 's%.*terminated-pod-gc-threshold[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .controllermanager_config }} | grep -- --terminated-pod-gc-threshold | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.3.2
+  attributeId: 1.3.2
+  name: Controller Manager --profiling
+  component: controllermanager
+  audit: |
+    VAL=$(ps -ef | grep {{ .controllermanager_bin }} | grep -- --profiling | sed 's%.*profiling[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .controllermanager_config }} | grep -- --profiling | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.3.3
+  attributeId: 1.3.3
+  name: Controller Manager --use-service-account-credentials
+  component: controllermanager
+  audit: |
+    VAL=$(ps -ef | grep {{ .controllermanager_bin }} | grep -- --use-service-account-credentials | sed 's%.*use-service-account-credentials[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .controllermanager_config }} | grep -- --use-service-account-credentials | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.3.4
+  attributeId: 1.3.4
+  name: Controller Manager --service-account-private-key-file
+  component: controllermanager
+  audit: |
+    VAL=$(ps -ef | grep {{ .controllermanager_bin }} | grep -- --service-account-private-key-file | sed 's%.*service-account-private-key-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .controllermanager_config }} | grep -- --service-account-private-key-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.3.5
+  attributeId: 1.3.5
+  name: Controller Manager --root-ca-file
+  component: controllermanager
+  audit: |
+    VAL=$(ps -ef | grep {{ .controllermanager_bin }} | grep -- --root-ca-file | sed 's%.*root-ca-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .controllermanager_config }} | grep -- --root-ca-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.3.6
+  attributeId: 1.3.6
+  name: Controller Manager --feature-gates RotateKubeletServerCertificate
+  component: controllermanager
+  audit: /bin/ps -ef | grep {{ .controllermanager_bin }} | grep -v grep | grep -- --feature-gates | sed 's%.*feature-gates[= ]\([^ ]*\).*%\1%' | grep -o 'RotateKubeletServerCertificate=[^, }]*' | sed 's/^.*=//'
+- id: 1.3.7
+  attributeId: 1.3.7
+  name: Controller Manager --bind-address
+  component: controllermanager
+  audit: |
+    VAL=$(ps -ef | grep {{ .controllermanager_bin }} | grep -- --bind-address | sed 's%.*bind-address[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .controllermanager_config }} | grep -- --bind-address | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.4.1
+  attributeId: 1.4.1
+  name: Scheduler --profiling
+  component: scheduler
+  audit: |
+    VAL=$(ps -ef | grep {{ .scheduler_bin }} | grep -- --profiling | sed 's%.*profiling[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .scheduler_config }} | grep -- --profiling | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 1.4.2
+  attributeId: 1.4.2
+  name: Scheduler --bind-address
+  component: scheduler
+  audit: |
+    VAL=$(ps -ef | grep {{ .scheduler_bin }} | grep -- --bind-address | sed 's%.*bind-address[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .scheduler_config }} | grep -- --bind-address | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: "2.1"
+  attributeId: "2.1"
+  name: Etcd Node Configuration Files
+  component: etcd
+  audit: |
+    CERT=$(ps -ef | grep {{ .etcd_bin}} | grep -- --cert-file | sed 's%.*cert-file[= ]\([^ ]*\).*%\1%')
+    if test -z $CERT; then CERT=$(cat {{ .etcd_config }} | grep -- --cert-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$CERT" == "null" ]; then CERT=''; fi
+
+    KEY=$(ps -ef | grep {{ .etcd_bin}} | grep -- --key-file | sed 's%.*key-file[= ]\([^ ]*\).*%\1%')
+    if test -z $KEY; then KEY=$(cat {{ .etcd_config }} | grep -- --key-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$KEY" == "null" ]; then KEY=''; fi
+
+    echo $CERT
+    echo $KEY
+- id: "2.2"
+  attributeId: "2.2"
+  name: Etcd --client-cert-auth
+  component: etcd
+  audit: |
+    VAL=$(ps -ef | grep {{ .etcd_bin}} | grep -- --client-cert-auth | sed 's%.*client-cert-auth[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .etcd_config }} | grep -- --client-cert-auth | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: "2.3"
+  attributeId: "2.3"
+  name: Etcd --auto-tls
+  component: etcd
+  audit: |
+    VAL=$(ps -ef | grep {{ .etcd_bin}} | grep -- --auto-tls | sed 's%.*auto-tls[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .etcd_config }} | grep -- --auto-tls | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: "2.4"
+  attributeId: "2.4"
+  name: Etcd --peer-cert-file & --peer-key-file
+  component: etcd
+  audit: |
+    CERT=$(ps -ef | grep {{ .etcd_bin}} | grep -- --peer-cert-file | sed 's%.*peer-cert-file[= ]\([^ ]*\).*%\1%')
+    if test -z $CERT; then CERT=$(cat {{ .etcd_config }} | grep -- --peer-cert-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$CERT" == "null" ]; then CERT=''; fi
+
+    KEY=$(ps -ef | grep {{ .etcd_bin}} | grep -- --peer-key-file | sed 's%.*peer-key-file[= ]\([^ ]*\).*%\1%')
+    if test -z $KEY; then KEY=$(cat {{ .etcd_config }} | grep -- --peer-key-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$KEY" == "null" ]; then KEY=''; fi
+
+    echo $CERT
+    echo $KEY
+- id: "2.5"
+  attributeId: "2.5"
+  name: Etcd --peer-client-cert-auth
+  component: etcd
+  audit: |
+    VAL=$(ps -ef | grep {{ .etcd_bin}} | grep -- --peer-client-cert-auth | sed 's%.*peer-client-cert-auth[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .etcd_config }} | grep -- --peer-client-cert-auth | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: "2.6"
+  attributeId: "2.6"
+  name: Etcd --peer-auto-tls
+  component: etcd
+  audit: |
+    VAL=$(ps -ef | grep {{ .etcd_bin}} | grep -- --peer-auto-tls | sed 's%.*peer-auto-tls[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .etcd_config }} | grep -- --peer-auto-tls | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: "2.7"
+  attributeId: "2.7"
+  name: Ensure that a unique Certificate Authority is used for etcd
+  component: etcd
+  audit: |
+    ETCDFILE=$(ps -ef | grep {{ .etcd_bin}} | grep -- --trusted-ca-file | sed 's%.*trusted-ca-file[= ]\([^ ]*\).*%\1%')
+    APISERVERFILE=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --client-ca-file | sed 's%.*client-ca-file[= ]\([^ ]*\).*%\1%')
+    if [ "$ETCDFILE" == "$APISERVERFILE" ]; then
+      echo false
+    else 
+      echo true
+    fi
+- id: 3.1.1
+  attributeId: 3.1.1
+  name: Client certificate authentication should not be used for users
+  component: apiserver
+  audit: ""
+- id: 3.2.1
+  attributeId: 3.2.1
+  name: Ensure that a minimal audit policy is created
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --audit-policy-file | sed 's%.*audit-policy-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --audit-policy-file | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 3.2.2
+  attributeId: 3.2.2
+  name: Ensure that the audit policy covers key security concerns
+  component: apiserver
+  audit: ""
+- id: 4.1.1
+  attributeId: 4.1.1
+  name: Kubelet service file permissions
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_service }}; then stat -c %a {{ .kubelet_service }}; else exit 80; fi'
+- id: 4.1.2
+  attributeId: 4.1.2
+  name: Kubelet service file ownership
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_service }}; then stat -c %U:%G {{ .kubelet_service }}; else exit 80; fi'
+- id: 4.1.3
+  attributeId: 4.1.3
+  name: Proxy kubeconfig file permissions
+  component: proxy
+  audit: /bin/sh -c 'if test -e {{ .proxy_kubeconfig }}; then stat -c %a {{ .proxy_kubeconfig }}; else exit 80; fi'
+- id: 4.1.4
+  attributeId: 4.1.4
+  name: Proxy kubeconfig file ownership
+  component: proxy
+  audit: /bin/sh -c 'if test -e {{ .proxy_kubeconfig }}; then stat -c %U:%G {{ .proxy_kubeconfig }}; else exit 80; fi'
+- id: 4.1.5
+  attributeId: 4.1.5
+  name: Kubelet kubeconfig file permissions
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_kubeconfig }}; then stat -c %a {{ .kubelet_kubeconfig }}; else exit 80; fi'
+- id: 4.1.6
+  attributeId: 4.1.6
+  name: Kubelet kubeconfig file ownership
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_kubeconfig }}; then stat -c %U:%G {{ .kubelet_kubeconfig }}; else exit 80; fi'
+- id: 4.1.7
+  attributeId: 4.1.7
+  name: Ensure that the certificate authorities file permissions are set to 644 or more restrictive
+  component: kubelet
+  audit: |
+    CAFILE=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --client-ca-file | sed 's%.*client-ca-file[= ]\([^ ]*\).*%\1%')
+    if test -z $CAFILE; then CAFILE={{ .kubelet_ca }}; fi
+    if test -e $CAFILE; then stat -c %a $CAFILE; else exit 80; fi
+- id: 4.1.8
+  attributeId: 4.1.8
+  name: Ensure that the client certificate authorities file ownership is set to root:root
+  component: kubelet
+  audit: |
+    CAFILE=$(ps -ef | grep kubelet | grep -v apiserver | grep -- --client-ca-file= | awk -F '--client-ca-file=' '{print $2}' | awk '{print $1}')
+    if test -z $CAFILE; then CAFILE={{ .kubelet_ca }}; fi
+    if test -e $CAFILE; then stat -c %U:%G $CAFILE; fi
+- id: 4.1.9
+  attributeId: 4.1.9
+  name: Kubelet config file permissions
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_config }}; then stat -c %a {{ .kubelet_config }}; else exit 80; fi'
+- id: 4.1.10
+  attributeId: 4.1.10
+  name: Kubelet config file ownership
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_config }}; then stat -c %U:%G {{ .kubelet_config }}; else exit 80; fi'
+- id: 4.2.1
+  attributeId: 4.2.1
+  name: Kubelet --anonymous-auth
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --anonymous-auth | sed 's%.*anonymous-auth[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | awk '/^[^[:blank:]]/{p=0} /authentication/{p=1} p' | grep -A1 "anonymous:" | grep "enabled": | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.2
+  attributeId: 4.2.2
+  name: Kubelet --authorization-mode
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --authorization-mode | sed 's%.*authorization-mode[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | awk '/^[^[:blank:]]/{p=0} /authorization/{p=1} p' | grep "mode:" | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.3
+  attributeId: 4.2.3
+  name: Kubelet --client-ca-file
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --client-ca-file | sed 's%.*client-ca-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | awk '/^[^[:blank:]]/{p=0} /authentication/{p=1} p' | grep -A1 "x509:" | grep "clientCAFile": | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.4
+  attributeId: 4.2.4
+  name: Kubelet --read-only-port
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --read-only-port | sed 's%.*read-only-port[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep "readOnlyPort:" | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.5
+  attributeId: 4.2.5
+  name: Kubelet --streaming-connection-idle-timeout
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --streaming-connection-idle-timeout | sed 's%.*streaming-connection-idle-timeout[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep 'streamingConnectionIdleTimeout:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.6
+  attributeId: 4.2.6
+  name: Kubelet --protect-kernel-defaults
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --protect-kernel-defaults | sed 's%.*protect-kernel-defaults[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep 'protectKernelDefaults:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.7
+  attributeId: 4.2.7
+  name: Kubelet --make-iptables-util-chains
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --make-iptables-util-chains | sed 's%.*make-iptables-util-chains[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep 'makeIPTablesUtilChains:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.8
+  attributeId: 4.2.8
+  name: Kubelet --hostname-override
+  component: kubelet
+  audit: ps -ef | grep {{ .kubelet_bin }} | grep -- --hostname-override | sed 's%.*hostname-override[= ]\([^ ]*\).*%\1%'
+- id: 4.2.9
+  attributeId: 4.2.9
+  name: Kubelet --event-qps
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --event-qps | sed 's%.*event-qps[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep 'eventRecordQPS:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.10
+  attributeId: 4.2.10
+  name: Kubelet --tls-cert-file & --tls-private-key-file
+  component: kubelet
+  audit: |
+    CERT=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --tls-cert-file | sed 's%.*tls-cert-file[= ]\([^ ]*\).*%\1%')
+    if test -z $CERT; then CERT=$(cat {{ .kubelet_config }} | grep 'tlsCertFile:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$CERT" == "null" ]; then CERT=''; fi
+
+    KEY=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --tls-private-key-file | sed 's%.*tls-private-key-file[= ]\([^ ]*\).*%\1%')
+    if test -z $KEY; then KEY=$(cat {{ .kubelet_config }} | grep 'tlsPrivateKeyFile:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    if [ "$KEY" == "null" ]; then KEY=''; fi
+
+    echo $CERT
+    echo $KEY
+- id: 4.2.11
+  attributeId: 4.2.11
+  name: Kubelet --rotate-certificates
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --rotate-certificates | sed 's%.*rotate-certificates[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep 'rotateCertificates:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: 4.2.12
+  attributeId: 4.2.12
+  name: Kubelet RotateKubeletServerCertificate
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- RotateKubeletServerCertificate | sed 's%.*RotateKubeletServerCertificate[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep featureGates | grep RotateKubeletServerCertificate= | sed 's%.*RotateKubeletServerCertificate[= ]\([^ ]*\).*%\1%' | sed 's/,.*//'); fi
+    echo $VAL
+- id: 4.2.13
+  attributeId: 4.2.13
+  name: Kubelet --tls-cipher-suites
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --tls-cipher-suites | sed 's%.*tls-cipher-suites[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | grep 'tlsCipherSuites:' | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL
+- id: v23-1.2.3
+  attributeId: v23-1.2.3
+  name: API Server --DenyServiceExternalIPs
+  component: apiserver
+  audit: |
+    VAL=$(ps -ef | grep {{ .apiserver_bin }} | grep -- --DenyServiceExternalIPs | sed 's%.*DenyServiceExternalIPs[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .apiserver_config }} | grep -- --DenyServiceExternalIPs | sed 's%.*[= ]\([^ ]*\).*%\1%'); fi
+    echo $VAL

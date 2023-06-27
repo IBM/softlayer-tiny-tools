@@ -1,0 +1,290 @@
+- id: 2.1.1
+  name: Enable audit logs (Manual)
+  attributeId: 2.1.1
+  component: ""
+  audit: ""
+- id: 3.1.1
+  name: Kubelet kubeconfig file permissions
+  attributeId: 4.1.5
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_kubeconfig }}; then stat -c %a {{ .kubelet_kubeconfig }}; else exit 80; fi'
+- id: 3.1.2
+  name: Kubelet kubeconfig file ownership
+  attributeId: 4.1.6
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_kubeconfig }}; then stat -c %U:%G {{ .kubelet_kubeconfig }}; else exit 80; fi'
+- id: 3.1.3
+  name: Kubelet config file permissions
+  attributeId: 4.1.9
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_config }}; then stat -c %a {{ .kubelet_config }}; else exit 80; fi'
+- id: 3.1.4
+  name: Kubelet config file ownership
+  attributeId: 4.1.10
+  component: kubelet
+  audit: /bin/sh -c 'if test -e {{ .kubelet_config }}; then stat -c %U:%G {{ .kubelet_config }}; else exit 80; fi'
+- id: 3.2.1
+  name: Kubelet --anonymous-auth
+  attributeId: 4.2.1
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --anonymous-auth | sed 's%.*anonymous-auth[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.authentication.anonymous.enabled | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.2
+  name: Kubelet --authorization-mode
+  attributeId: 4.2.2
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --authorization-mode | sed 's%.*authorization-mode[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.authorization.mode | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.3
+  name: Kubelet --client-ca-file
+  attributeId: 4.2.3
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --client-ca-file | sed 's%.*client-ca-file[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.authentication.x509.clientCAFile | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.4
+  name: Kubelet --read-only-port
+  attributeId: 4.2.4
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --read-only-port | sed 's%.*read-only-port[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.readOnlyPort | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.5
+  name: Kubelet --streaming-connection-idle-timeout
+  attributeId: 4.2.5
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --streaming-connection-idle-timeout | sed 's%.*streaming-connection-idle-timeout[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.streamingConnectionIdleTimeout | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.6
+  name: Kubelet --protect-kernel-defaults
+  attributeId: 4.2.6
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --protect-kernel-defaults | sed 's%.*protect-kernel-defaults[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.protectKernelDefaults | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.7
+  name: Kubelet --make-iptables-util-chains
+  attributeId: 4.2.7
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --make-iptables-util-chains | sed 's%.*make-iptables-util-chains[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.makeIPTablesUtilChains | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.8
+  name: Kubelet --hostname-override
+  attributeId: 4.2.8
+  component: kubelet
+  audit: ps -ef | grep {{ .kubelet_bin }} | grep -- --hostname-override | sed 's%.*hostname-override[= ]\([^ ]*\).*%\1%'
+- id: 3.2.9
+  name: Kubelet --event-qps
+  attributeId: 4.2.9
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --event-qps | sed 's%.*event-qps[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.eventRecordQPS | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.10
+  name: Kubelet --rotate-certificates
+  attributeId: 4.2.11
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- --rotate-certificates | sed 's%.*rotate-certificates[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.rotateCertificates | select (.!=null)'); fi
+    echo $VAL
+- id: 3.2.11
+  name: Kubelet RotateKubeletServerCertificate
+  attributeId: 4.2.12
+  component: kubelet
+  audit: |
+    VAL=$(ps -ef | grep {{ .kubelet_bin }} | grep -- RotateKubeletServerCertificate | sed 's%.*RotateKubeletServerCertificate[= ]\([^ ]*\).*%\1%')
+    if test -z $VAL; then VAL=$(cat {{ .kubelet_config }} | jq '.featureGates.RotateKubeletServerCertificate | select (.!=null)'); fi
+    echo $VAL
+- id: 4.1.1
+  name: Ensure that the cluster-admin role is only used where required (Manual)
+  attributeId: 4.1.1-eks
+  component: ""
+  audit: ""
+- id: 4.1.2
+  name: Minimize access to secrets (Manual)
+  attributeId: 4.1.2-eks
+  component: ""
+  audit: ""
+- id: 4.1.3
+  name: Minimize wildcard use in Roles and ClusterRoles (Manual)
+  attributeId: 4.1.3-eks
+  component: ""
+  audit: ""
+- id: 4.1.4
+  name: Minimize access to create pods (Manual)
+  attributeId: 4.1.4-eks
+  component: ""
+  audit: ""
+- id: 4.1.5
+  name: Ensure that default service accounts are not actively used. (Manual)
+  attributeId: 4.1.5-eks
+  component: ""
+  audit: ""
+- id: 4.1.6
+  name: Ensure that Service Account Tokens are only mounted where necessary (Manual)
+  attributeId: 4.1.6-eks
+  component: ""
+  audit: ""
+- id: 4.2.1
+  name: Minimize the admission of privileged containers (Automated)
+  attributeId: 4.2.1-eks
+  component: ""
+  audit: ""
+- id: 4.2.2
+  name: Minimize the admission of containers wishing to share the host process ID namespace (Automated)
+  attributeId: 4.2.2-eks
+  component: ""
+  audit: ""
+- id: 4.2.3
+  name: Minimize the admission of containers wishing to share the host IPC namespace (Automated)
+  attributeId: 4.2.3-eks
+  component: ""
+  audit: ""
+- id: 4.2.4
+  name: Minimize the admission of containers wishing to share the host network namespace (Automated)
+  attributeId: 4.2.4-eks
+  component: ""
+  audit: ""
+- id: 4.2.5
+  name: Minimize the admission of containers with allowPrivilegeEscalation (Automated)
+  attributeId: 4.2.5-eks
+  component: ""
+  audit: ""
+- id: 4.2.6
+  name: Minimize the admission of root containers (Automated)
+  attributeId: 4.2.6-eks
+  component: ""
+  audit: ""
+- id: 4.2.7
+  name: Minimize the admission of containers with the NET_RAW capability (Automated)
+  attributeId: 4.2.7-eks
+  component: ""
+  audit: ""
+- id: 4.2.8
+  name: Minimize the admission of containers with added capabilities (Automated)
+  attributeId: 4.2.8-eks
+  component: ""
+  audit: ""
+- id: 4.2.9
+  name: Minimize the admission of containers with capabilities assigned (Manual)
+  attributeId: 4.2.9-eks
+  component: ""
+  audit: ""
+- id: 4.3.1
+  name: Ensure that the latest CNI version is used (Manual)
+  attributeId: 4.3.1-eks
+  component: ""
+  audit: ""
+- id: 4.3.2
+  name: Ensure that all Namespaces have Network Policies defined (Automated)
+  attributeId: 4.3.2-eks
+  component: ""
+  audit: ""
+- id: 4.4.1
+  name: Prefer using secrets as files over secrets as environment variables (Manual)
+  attributeId: 4.4.1-eks
+  component: ""
+  audit: ""
+- id: 4.4.2
+  name: Consider external secret storage (Manual)
+  attributeId: 4.4.2-eks
+  component: ""
+  audit: ""
+- id: 4.5.1
+  name: Configure Image Provenance using ImagePolicyWebhook admission controller (Manual)
+  attributeId: 4.5.1-eks
+  component: ""
+  audit: ""
+- id: 4.6.1
+  name: Create administrative boundaries between resources using namespaces (Manual)
+  attributeId: 4.6.1-eks
+  component: ""
+  audit: ""
+- id: 4.6.2
+  name: Apply Security Context to Your Pods and Containers (Manual)
+  attributeId: 4.6.2-eks
+  component: ""
+  audit: ""
+- id: 4.6.3
+  name: The default namespace should not be used (Automated)
+  attributeId: 4.6.3-eks
+  component: ""
+  audit: ""
+- id: 5.1.1
+  name: Ensure Image Vulnerability Scanning using Amazon ECR image scanning or a third-party provider (Manual)
+  attributeId: 5.1.1
+  component: ""
+  audit: ""
+- id: 5.1.2
+  name: Minimize user access to Amazon ECR (Manual)
+  attributeId: 5.1.2
+  component: ""
+  audit: ""
+- id: 5.1.3
+  name: Minimize cluster access to read-only for Amazon ECR (Manual)
+  attributeId: 5.1.3
+  component: ""
+  audit: ""
+- id: 5.1.4
+  name: Minimize Container Registries to only those approved (Manual)
+  attributeId: 5.1.4
+  component: ""
+  audit: ""
+- id: 5.2.1
+  name: Prefer using dedicated Amazon EKS Service Accounts (Manual)
+  attributeId: 5.2.1
+  component: ""
+  audit: ""
+- id: 5.3.1
+  name: Ensure Kubernetes Secrets are encrypted using Customer Master Keys (CMKs) managed in AWS KMS (Manual)
+  attributeId: 5.3.1
+  component: ""
+  audit: ""
+- id: 5.4.1
+  name: Restrict Access to the Control Plane Endpoint (Manual)
+  attributeId: 5.4.1
+  component: ""
+  audit: ""
+- id: 5.4.2
+  name: Ensure clusters are created with Private Endpoint Enabled and Public Access Disabled (Manual)
+  attributeId: 5.4.2
+  component: ""
+  audit: ""
+- id: 5.4.3
+  name: Ensure clusters are created with Private Nodes (Manual)
+  attributeId: 5.4.3
+  component: ""
+  audit: ""
+- id: 5.4.4
+  name: Ensure Network Policy is Enabled and set as appropriate (Manual)
+  attributeId: 5.4.4
+  component: ""
+  audit: ""
+- id: 5.4.5
+  name: Encrypt traffic to HTTPS load balancers with TLS certificates (Manual)
+  attributeId: 5.4.5
+  component: ""
+  audit: ""
+- id: 5.5.1
+  name: Manage Kubernetes RBAC users with AWS IAM Authenticator for Kubernetes (Manual)
+  attributeId: 5.5.1
+  component: ""
+  audit: ""
+- id: 5.6.1
+  name: Consider Fargate for running untrusted workloads (Manual)
+  attributeId: 5.6.1
+  component: ""
+  audit: ""

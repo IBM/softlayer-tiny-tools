@@ -1,0 +1,3450 @@
+- id: "1.1.1.1.a"
+  name: "cramfs module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v cramfs
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.1.b"
+  name: "cramfs module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep cramfs || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.2.a"
+  name: "freevxfs module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v freevxfs
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.2.b"
+  name: "freevxfs module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep freevxfs || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.3.a"
+  name: "jffs2 module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v jffs2
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.3.b"
+  name: "jffs2 module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep jffs2 || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 127
+    fi
+- id: "1.1.1.4.a"
+  name: "hfs module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v hfs
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.4.b"
+  name: "hfs module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep hfs || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.5.a"
+  name: "hfsplus module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v hfsplus
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.5.b"
+  name: "hfsplus module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep hfsplus || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.6.a"
+  name: "squashfs module installed"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v modprobe >/dev/null 2>&1; then
+            modprobe -n -v squashfs
+          else
+            echo >&2 "modprobe: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+
+- id: "1.1.1.6.b"
+  name: "squashfs module not loaded"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v lsmod >/dev/null 2>&1; then
+            lsmod | grep squashfs || true
+          else
+            echo >&2 "lsmod: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+
+- id: "1.1.1.7.a"
+  name: "udf module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v udf
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.7.b"
+  name: "udf module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep udf || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 127
+    fi
+
+- id: "1.1.1.8.a"
+  name: "/etc/fstab does not contain `vfat` lines"
+  sub_checks:
+    - check:
+        audit: "grep -i vfat /etc/fstab"
+        constraints:
+          platform:
+            - "rhel7"
+
+- id: "1.1.1.8.b"
+  name: "vfat module installed"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v modprobe >/dev/null 2>&1; then
+            modprobe -n -v vfat
+          else
+            echo >&2 "modprobe: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+
+- id: "1.1.1.8.c"
+  name: "vfat module not loaded"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v lsmod >/dev/null 2>&1; then
+            lsmod | grep vfat || true
+          else
+            echo >&2 "lsmod: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+
+- id: "1.1.2.a"
+  name: "mount reports /tmp mounted"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/tmp\\s' || true"
+
+- id: "1.1.2.b"
+  name: "tmp.mount enabled"
+  audit: "grep -E '\\s/tmp\\s' /etc/fstab | grep -E -v '^\\s*#' || true"
+
+- id: "1.1.3"
+  name: "mount reports `nodev` in /tmp"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/tmp\\s' | grep -v nodev || true"
+
+- id: "1.1.4"
+  name: "mount reports `nosuid` in /tmp"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/tmp\\s' | grep -v nosuid || true"
+
+- id: "1.1.5"
+  name: "mount reports `noexec` in /tmp"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/tmp\\s' | grep -v noexec || true"
+
+- id: "1.1.6"
+  name: "mount reports /var mounted"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/var\\s'"
+
+- id: "1.1.7"
+  name: "mount reports /var/tmp mounted"
+  audit: "nsenter -m -t 1 mount | grep /var/tmp"
+
+- id: "1.1.8"
+  name: "mount reports `nodev` in /var/tmp"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/var/tmp\\s' | grep -v nodev || true"
+
+- id: "1.1.9"
+  name: "mount reports `nosuid` in /var/tmp"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/var/tmp\\s' | grep -v nosuid || true"
+
+- id: "1.1.10"
+  name: "mount reports `noexec` in /var/tmp"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/var/tmp\\s' | grep -v noexec || true"
+
+- id: "1.1.11"
+  name: "mount reports /var/log mounted"
+  audit: "nsenter -m -t 1 mount | grep /var/log"
+
+- id: "1.1.12"
+  name: "mount reports /var/log/audit mounted"
+  audit: "nsenter -m -t 1 mount | grep /var/log/audit"
+
+- id: "1.1.13"
+  name: "mount reports /home mounted"
+  audit: "nsenter -m -t 1 mount | grep /home"
+
+- id: "1.1.14"
+  name: "mount reports `nodev` in /home"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/home\\s' | grep -v nodev || true"
+
+- id: "1.1.15"
+  name: "mount reports `nodev` in /dev/shm"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/dev/shm\\s' | grep -v nodev || true"
+
+- id: "1.1.16"
+  name: "mount reports `nosuid` in /dev/shm"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/dev/shm\\s' | grep -v nosuid || true"
+
+- id: "1.1.17"
+  name: "mount reports `noexec` in /dev/shm"
+  audit: "nsenter -m -t 1 mount | grep -E '\\s/dev/shm\\s' | grep -v noexec || true"
+
+- id: "1.1.18-1.1.19-1.1.20"
+  name: "mount reports `nodev` in all removable media partitions"
+  audit: "nsenter -m -t 1 mount"
+
+- id: "1.1.21"
+  name: "Sticky bit in world-writable directories"
+  audit: "df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type d \\( -perm -0002 -a ! -perm -1000 \\) 2>/dev/null | head -n 100"
+
+- id: "1.1.22"
+  name: "autofs disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list autofs
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled autofs
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep autofs"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "1.1.23.a"
+  name: "usb-storage module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v usb-storage
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "1.1.23.b"
+  name: "usb-storage module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep squashfs || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 127
+    fi
+
+- id: "1.2.1"
+  name: "Package manager repositories configured"
+  sub_checks:
+    - check:
+        audit: "yum repo-list"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "apt-cache policy"
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "zypper repos"
+        constraints:
+          platform:
+            - "opensuse"
+
+- id: "1.2.2"
+  name: "Package manager GPG keys configured"
+  sub_checks:
+    - check:
+        audit: "rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}'"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "apt-key list"
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "zypper repos"
+        constraints:
+          platform:
+            - "opensuse"
+
+- id: "1.3.1"
+  name: "aide installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q aide || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s aide"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show aide"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "1.3.2.a"
+  name: "aidcheck.service enabled"
+  audit: |
+    if command -v crontab >/dev/null 2>&1; then
+      crontab -u root -l | grep aide
+    else
+      echo >&2 "crontab: command not found"
+      exit 127
+    fi
+
+- id: "1.3.2.b"
+  name: "aidcheck.service running"
+  audit: "grep -r aide /etc/cron.* /etc/crontab"
+
+- id: "1.4.1"
+  name: "Boot Settings Permissions - bootloader config"
+  sub_checks:
+    - check:
+        audit: "stat -c %a/Uid:%U/%uGid:%G/%g /boot/grub/menu.lst"
+        constraints:
+          boot:
+            - "grub"
+    - check:
+        audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/default/grub"
+        constraints:
+          boot:
+            - "grub2"
+- id: "1.4.2"
+  name: "Boot Settings - bootloader password"
+  sub_checks:
+    - check:
+        audit: "grep \"^\\s*password\" /boot/grub/menu.lst"
+        constraints:
+          boot:
+            - "grub"
+    - check:
+        audit: "grep \"^\\s*GRUB2_PASSWORD\" /boot/grub2/user.cfg"
+        constraints:
+          boot:
+            - "grub2"
+
+- id: "1.4.3"
+  name: "/etc/shadow contains password for `root` user"
+  audit: 'grep ^root:[*\!]: /etc/shadow || true'
+
+- id: "1.4.4"
+  name: "/etc/sysconfig/boot contains `PROMPT_FOR_CONFIRM=\"no\"` setting"
+  sub_checks:
+    - check:
+        audit: "grep \"^PROMPT_FOR_CONFIRM=\" /etc/sysconfig/boot"
+        constraints:
+          boot:
+            - "grub"
+          platform:
+            - "rhel7"
+    - check:
+        audit: "grep PROMPT /etc/sysconfig/init"
+        constraints:
+          boot:
+            - "grub2"
+          platform:
+            - "rhel7"
+
+- id: "1.5.1.a"
+  name: "/etc/security/limits.conf or /etc/security/limits.d/* contains `* hard core 0` setting"
+  audit: |
+    grep "hard\s*core" /etc/security/limits.conf || true
+    grep "hard\s*core" /etc/security/limits.d/* || true
+
+- id: "1.5.1.b"
+  name: "sysctl reports `fs.suid_dumpable = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl fs.suid_dumpable
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "1.5.1.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `fs.suid_dumpable = 0` setting"
+  audit: "grep \"fs\\.suid_dumpable\" /etc/sysctl.conf /etc/sysctl.d/* | head -n 1"
+
+- id: "1.5.1.d"
+  name: "coredump.service enabled"
+  audit: |
+    if command -v systemctl >/dev/null 2>&1; then
+      systemctl is-enabled coredump.service
+    else
+      echo >&2 "systemctl: command not found"
+      exit 127
+    fi
+
+- id: "1.5.2"
+  name: "journalctl reports `kernel: NX (Execute Disable) protection: active`"
+  audit: |
+    if command -v journalctl >/dev/null 2>&1; then
+      journalctl | grep 'protection: active'
+    else
+      echo >&2 "journalctl: command not found"
+      exit 127
+    fi
+
+- id: "1.5.3.a"
+  name: "sysctl reports `kernel.randomize_va_space = 2` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl kernel.randomize_va_space
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "1.5.3.b"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `kernel.randomize_va_space = 2` setting"
+  audit: |
+    grep "kernel\.randomize_va_space" /etc/sysctl.conf || true
+    grep "kernel\.randomize_va_space" /etc/sysctl.d/* || true
+
+- id: "1.5.4"
+  name: "prelink not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q prelink || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s prelink || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show prelink || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "1.6.1.1"
+  name: "SELinux / AppArmor installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q libselinux || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+          lsm:
+            - "selinux"
+    - check:
+        audit: "rpm -q apparmor || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+          lsm:
+            - "apparmor"
+    - check:
+        audit: "dpkg -s libselinux1 || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+          lsm:
+            - "selinux"
+    - check:
+        audit: "dpkg -s apparmor"
+        constraints:
+          platform:
+            - "ubuntu16"
+          lsm:
+            - "apparmor"
+    - check:
+        audit: "apt-cache show libselinux1"
+        constraints:
+          platform:
+            - "ubuntu18"
+          lsm:
+            - "selinux"
+    - check:
+        audit: "apt-cache show apparmor"
+        constraints:
+          platform:
+            - "ubuntu18"
+          lsm:
+            - "apparmor"
+
+- id: "1.6.2.1"
+  name: "/boot/grub/menu.lst does not contain `selinux=0` or `enforcing=0` settings on `kernel` / `linux` lines"
+  sub_checks:
+    - check:
+        audit: "grep \"^\\s*kernel\" /boot/grub/menu.lst || true"
+        constraints:
+          lsm:
+            - "selinux"
+          boot:
+            - "grub"
+    - check:
+        audit: "grep \"^\\s*linux\" /boot/grub2/grub.cfg || true"
+        constraints:
+          lsm:
+            - "selinux"
+          boot:
+            - "grub2"
+
+- id: "1.6.2.2.a"
+  name: "/etc/selinux/config contains `SELINUX=enforcing` setting"
+  sub_checks:
+    - check:
+        audit: "grep SELINUX=enforcing /etc/selinux/config"
+        constraints:
+          lsm:
+            - "selinux"
+
+- id: "1.6.2.2.b"
+  name: "sestatus reports `SELinux status: enabled`, `Current mode: enforcing` and `Mode from config file: enforcing` statuses"
+  sub_checks:
+    - check:
+        audit: "sestatus"
+        constraints:
+          lsm:
+            - "selinux"
+
+- id: "1.6.2.3.a"
+  name: "/etc/selinux/config contains `SELINUXTYPE=targeted` setting"
+  sub_checks:
+    - check:
+        audit: "grep SELINUXTYPE=targeted /etc/selinux/config"
+        constraints:
+          lsm:
+            - "selinux"
+
+- id: "1.6.2.3.b"
+  name: "sestatus reports `Policy from config file: targeted` or `Policy from config file: mls` statuses"
+  sub_checks:
+    - check:
+        audit: "sestatus"
+        constraints:
+          lsm:
+            - "selinux"
+
+- id: "1.6.2.4"
+  name: "setroubleshot not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q setroubleshoot || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+          lsm:
+            - "selinux"
+    - check:
+        audit: "dpkg -s setroubleshoot"
+        constraints:
+          platform:
+            - "ubuntu16"
+          lsm:
+            - "selinux"
+    - check:
+        audit: "apt-cache show setroubleshoot || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+          lsm:
+            - "selinux"
+
+- id: "1.6.2.5"
+  name: "mcstransd not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q mcstrans || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s mcstrans || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show mcstrans || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "1.6.2.6"
+  name: "No unconfined daemons exist"
+  audit: "ps -eZ | egrep \"initrc\" | grep -E -v -w \"tr|ps|egrep|bash|awk \" | tr ':' ' ' | awk '{ print $NF }'"
+
+- id: "1.6.3.1"
+  name: "grub does not contain `apparmor=0` setting on `kernel` lines"
+  sub_checks:
+    - check:
+        audit: "grep \"^\\s*kernel\" /boot/grub/menu.lst || true"
+        constraints:
+          lsm:
+            - "apparmor"
+          boot:
+            - "grub"
+    - check:
+        audit: "grep LINUX /etc/default/grub || true"
+        constraints:
+          lsm:
+            - "apparmor"
+          boot:
+            - "grub2"
+- id: "1.6.3.2"
+  name: "apparmor profiles loaded, not complaining, and no processes unconfined"
+  sub_checks:
+    - check:
+        audit: "apparmor_status"
+        constraints:
+          lsm:
+            - "apparmor"
+
+- id: "1.7.1.1.a"
+  name: "Command Line Warning Banners - message of the day"
+  audit: "cat /etc/motd"
+
+- id: "1.7.1.1.b"
+  name: /etc/motd doesn't include \m, \r, \s, \v instances or references to the OS platform
+  audit: "grep -E -i \"(\\\\v|\\\\r|\\\\m|\\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/\"//g'))\" /etc/motd || true"
+
+- id: "1.7.1.2.a"
+  name: "Command Line Warning Banners - local login"
+  audit: "cat /etc/issue"
+
+- id: "1.7.1.2.b"
+  name: /etc/issue doesn't include \m, \r, \s, \v instances or references to the OS platform
+  audit: "grep -E -i \"(\\\\v|\\\\r|\\\\m|\\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/\"//g'))\" /etc/issue || true"
+
+- id: "1.7.1.3.a"
+  name: "remote login warning banner"
+  audit: "cat /etc/issue.net"
+
+- id: "1.7.1.3.b"
+  name: /etc/issue.net doesn't include \m, \r, \s, \v instances or references to the OS platform
+  audit: "grep -E -i \"(\\\\v|\\\\r|\\\\m|\\\\s|$(grep '^ID=' /etc/os-release | cut -d= -f2 | sed -e 's/\"//g'))\" /etc/issue.net || true"
+
+- id: "1.7.1.4"
+  name: "/etc/motd owned by root:root and permissions 644"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/motd"
+
+- id: "1.7.1.5"
+  name: "/etc/issue owned by root:root and permissions 644"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/issue"
+
+- id: "1.7.1.6"
+  name: "/etc/issue.net owned by root:root and permissions 644"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/issue.net"
+
+- id: "1.7.2"
+  name: "/etc/gdm3/greeter.dconf-defaults configured"
+  audit: "grep -v ^#.* /etc/gdm3/greeter.dconf-defaults"
+
+- id: "1.8"
+  name: "All available updates installed"
+  sub_checks:
+    - check:
+        audit: "yum check-update"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "apt-get -s upgrade"
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "zypper list-updates"
+        constraints:
+          platform:
+            - "opensuse"
+
+- id: "2.1.1.a"
+  name: "/etc/inetd.* do not contain `chargen` lines"
+  audit: "grep -Rs \"^chargen\" /etc/inetd.* || true"
+
+- id: "2.1.1.b"
+  name: "/etc/xinetd.conf and /etc/xinetd.d/* do not contain `disable = yes` setting in `chargen` lines"
+  audit: "grep -Rs \"^chargen\" /etc/xinetd.conf /etc/xinetd.* "
+
+- id: "2.1.2.a"
+  name: "/etc/inetd.* do not contain `daytime` lines"
+  audit: "grep -Rs \"^daytime\" /etc/inetd.* || true"
+
+- id: "2.1.2.b"
+  name: "/etc/xinetd.conf and /etc/xinetd.d/* do not contain `disable = yes` setting in `daytime` lines"
+  audit: "grep -Rs \"^daytime\" /etc/xinetd.conf /etc/xinetd.*"
+
+- id: "2.1.3.a"
+  name: "/etc/inetd.* do not contain `discard` lines"
+  audit: "grep -Rs \"^discard\" /etc/inetd.* || true"
+
+- id: "2.1.3.b"
+  name: "/etc/xinetd.conf and /etc/xinetd.d/* do not contain `disable = yes` setting in `discard` lines"
+  audit: "grep -Rs \"^discard\" /etc/xinetd.conf /etc/xinetd.*"
+
+- id: "2.1.4.a"
+  name: "/etc/inetd.* do not contain `echo` lines"
+  audit: "grep -Rs \"^echo\" /etc/inetd.* || true"
+
+- id: "2.1.4.b"
+  name: "/etc/xinetd.conf and /etc/xinetd.d/* do not contain `disable = yes` setting in `echo` lines"
+  audit: "grep -Rs \"^echo\" /etc/xinetd.conf /etc/xinetd.*"
+
+- id: "2.1.5.a"
+  name: "/etc/inetd.* do not contain `time` lines"
+  audit: "grep -Rs \"^time\" /etc/inetd.* || true"
+
+- id: "2.1.5.b"
+  name: "/etc/xinetd.conf and /etc/xinetd.d/* do not contain `disable = yes` setting in `time` lines"
+  audit: "grep -Rs \"^time\" /etc/xinetd.conf /etc/xinetd.*"
+
+- id: "2.1.6.a"
+  name: "/etc/inetd.* do not contain `shell`, `login` or `exec` lines"
+  audit: "grep -Rs \"^shell\" /etc/inetd.* || true; grep -R \"^login\" /etc/inetd.* || true; grep -R \"^exec\" /etc/inetd.* || true"
+
+- id: "2.1.6.b"
+  name: "/etc/xinetd.* do not contain `shell`, `login` or `exec` lines"
+  audit: "grep -Rs \"^shell\" /etc/xinetd.*; grep -R \"^login\" /etc/xinetd.*; grep -R \"^exec\" /etc/xinetd.*"
+
+- id: "2.1.7.a"
+  name: "/etc/inetd.* do not contain `talk` or `ntalk` lines"
+  audit: "grep -Rs \"^talk\" /etc/inetd.* || true; grep -R \"^ntalk\" /etc/inetd.* || true"
+
+- id: "2.1.7.b"
+  name: "/etc/xinetd.* do not contain `talk` or `ntalk` lines"
+  audit: "grep -Rs \"^talk\" /etc/xinetd.*; grep -R \"^ntalk\" /etc/xinetd.*"
+
+- id: "2.1.8.a"
+  name: "/etc/inetd.* do not contain `telnet` lines"
+  audit: "grep -Rs \"^telnet\" /etc/inetd.* || true"
+
+- id: "2.1.8.b"
+  name: "/etc/xinetd.* do not contain `telnet` lines"
+  audit: "grep -Rs \"^telnet\" /etc/xinetd.*"
+
+- id: "2.1.9.a"
+  name: "/etc/inetd.* do not contain `tftp` lines"
+  audit: "grep -Rs \"^tftp\" /etc/inetd.* || true"
+
+- id: "2.1.9.b"
+  name: "/etc/xinetd.* do not contain `tftp` lines"
+  audit: "grep -Rs \"^tftp\" /etc/xinetd.*"
+
+- id: "2.1.10"
+  name: "xinetd disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list xinetd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled xinetd || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep xinetd || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.1.1.a"
+  name: "ntp installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q ntp || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s ntp"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show ntp"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "2.2.1.1.b"
+  name: "chrony installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q chrony || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s chrony"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show chrony"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "2.2.1.2.a"
+  name: "/etc/ntp.conf contains `restrict default kod nomodify notrap nopeer noquery` settings"
+  audit: "grep ^restrict /etc/ntp.conf"
+
+- id: "2.2.1.2.b"
+  name: "/etc/ntp.conf contains `server` or `pool` settings"
+  audit: "grep -E \"^(server|pool)\" /etc/ntp.conf"
+
+- id: "2.2.1.2.c"
+  name: "/etc/sysconfig/ntpd contains `OPTIONS=\"-u ntp:ntp\"` setting"
+  sub_checks:
+    - check:
+        audit: "grep ^OPTIONS /etc/sysconfig/ntpd"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "grep ^OPTIONS /etc/default/ntp"
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+
+- id: "2.2.1.2.d"
+  name: "/etc/sysconfig/ntp contains `NTPD_OPTIONS=\"-u ntp:ntp\"` setting"
+  sub_checks:
+    - check:
+        audit: "grep ^NTPD_OPTIONS /etc/sysconfig/ntp"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "grep ^NTPD_OPTIONS /etc/default/ntp"
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+
+- id: "2.2.1.2.e"
+  name: "/etc/init.d/ntp contains `RNAUSER=ntp` setting"
+  audit: "grep RUNASUSER=ntp /etc/init.d/ntp"
+
+- id: "2.2.1.3.a"
+  name: "/etc/chrony.conf contains `server` or `pool` settings"
+  audit: "grep -E \"^(server|pool)\" /etc/chrony.conf"
+
+- id: "2.2.1.3.b"
+  name: "chronyd run by chrony"
+  audit: "ps -ef | grep chronyd"
+
+- id: "2.2.1.4.a"
+  name: "system-timesyncd enabled"
+  audit: |
+    if command -v systemctl >/dev/null 2>&1; then
+      systemctl is-enabled systemd-timesyncd.service
+    else
+      echo >&2 "systemctl: command not found"
+      exit 127
+    fi
+
+- id: "2.2.1.4.b"
+  name: "timedatectl status returns appropriate output"
+  audit: |
+    if command -v timedatectl >/dev/null 2>&1; then
+      timedatectl status
+    else
+      echo >&2 "timedatectl: command not found"
+      exit 127
+    fi
+
+- id: "2.2.2"
+  name: "X not intalled"
+  sub_checks:
+    - check:
+        audit: "rpm -q xorg-x11* || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -l xserver-xorg* || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache policy xserver-xorg* | grep Installed -B1"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "2.2.3"
+  name: "avahi-daemon disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list avahi-daemon
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled avahi-daemon || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep avahi-daemon || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.4"
+  name: "cups disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list cups
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled cups || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep cups || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.5"
+  name: "dhcp disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list dhcpd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled dhcpd || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep dhcpd || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.6"
+  name: "sldap disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list slapd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled slapd || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep slapd || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.7.a"
+  name: "nfs disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list nfs
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled nfs || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep nfs || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.7.b"
+  name: "rpcbind disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list rpcbind
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled rpcbind || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep rpcbind || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.8"
+  name: "named disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list named
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled named || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep named || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.9"
+  name: "vsftpd disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list vsftpd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled vsftpd || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep vsftpd || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.10"
+  name: "httpd disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list httpd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled httpd || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep httpd || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.11"
+  name: "dovecot disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list dovecot
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled dovecot || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep dovecot || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.12"
+  name: "smb disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list smb
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled smb || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep smb || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.13"
+  name: "squid disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list squid
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled squid || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep squid || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.14"
+  name: "snmpd disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list snmpd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled snmpd || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep snmpd || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.15"
+  name: "MTA not listening on non-loopback address"
+  audit: |
+    ss -lntu | grep -E ':25\\s' | grep -E -v '\\s(127.0.0.1|::1):25\\s' || true
+
+- id: "2.2.16"
+  name: "rsyncd disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list rsyncd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled rsyncd || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep rsyncd || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.2.17"
+  name: "ypserv disabled in all runlevels"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list ypserv
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled ypserv || true
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep ypserv || true"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "2.3.1"
+  name: "ypbind not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q ypbind || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s ypbind || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show ypbind || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "2.3.2"
+  name: "rsh not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q rsh || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s rsh-client rsh-redone-client || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show rsh-client rsh-redone-client || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "2.3.3"
+  name: "talk not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q talk || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s talk || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show talk || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "2.3.4"
+  name: "telnet not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q telnet || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s telnet || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show telnet || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "2.3.5"
+  name: "openldap-clients not installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q openldap-clients || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s openldap-clients || true"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show openldap-clients || true"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "3.1.1.a"
+  name: "sysctl reports `net.ipv4.ip_forward = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.ip_forward
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.1.1.b"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.ip_forward = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.ip_forward" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.ip_forward" /etc/sysctl.d/* || true
+
+- id: "3.1.1.c"
+  name: "sysctl reports `net.ipv6.conf.all.forwarding = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv6.conf.all.forwarding
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.1.1.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv6.conf.all.forwarding = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv6\.conf\.all\.forwarding" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv6\.conf\.all\.forwarding" /etc/sysctl.d/* || true
+
+- id: "3.1.2.a"
+  name: "sysctl reports `net.ipv4.conf.all.send_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.all.send_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.1.2.b"
+  name: "sysctl reports `net.ipv4.conf.default.send_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.default.send_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.1.2.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.all.send_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.all\.send_redirects" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.all\.send_redirects" /etc/sysctl.d/* || true
+
+- id: "3.1.2.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.default.send_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.default\.send_redirects /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.default\.send_redirects /etc/sysctl.d/* || true
+
+- id: "3.2.1.a"
+  name: "sysctl reports `net.ipv4.conf.all.accept_source_route = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.all.accept_source_route
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.1.b"
+  name: "sysctl reports `net.ipv4.conf.default.accept_source_route = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.default.accept_source_route
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.1.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.all.accept_source_route = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.all\.accept_source_route" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.all\.accept_source_route" /etc/sysctl.d/* || true
+
+- id: "3.2.1.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.default.accept_source_route = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.default\.accept_source_route" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.default\.accept_source_route" /etc/sysctl.d/* || true
+
+- id: "3.2.1.e"
+  name: "sysctl reports `net.ipv6.conf.all.accept_source_route = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv6.conf.all.accept_source_route
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.1.f"
+  name: "sysctl reports `net.ipv6.conf.default.accept_source_route = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv6.conf.default.accept_source_route
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.1.g"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv6.conf.all.accept_source_route = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv6\.conf\.all\.accept_source_route" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv6\.conf\.all\.accept_source_route" /etc/sysctl.d/* || true
+
+- id: "3.2.1.h"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv6.conf.default.accept_source_route = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv6\.conf\.default\.accept_source_route" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv6\.conf\.default\.accept_source_route" /etc/sysctl.d/* || true
+
+- id: "3.2.2.a"
+  name: "sysctl reports `net.ipv4.conf.all.accept_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.all.accept_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.2.b"
+  name: "sysctl reports `net.ipv4.conf.default.accept_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.default.accept_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.2.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.all.accept_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.all\.accept_redirects" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.all\.accept_redirects" /etc/sysctl.d/* || true
+
+- id: "3.2.2.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.default.accept_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.default\.accept_redirects" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.default\.accept_redirects" /etc/sysctl.d/* || true
+
+- id: "3.2.2.e"
+  name: "sysctl reports `net.ipv6.conf.all.accept_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv6.conf.all.accept_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.2.f"
+  name: "sysctl reports `net.ipv6.conf.default.accept_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv6.conf.default.accept_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.2.g"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv6.conf.all.accept_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv6\.conf\.all\.accept_redirects" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv6\.conf\.all\.accept_redirects" /etc/sysctl.d/* || true
+
+- id: "3.2.2.h"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv6.conf.default.accept_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv6\.conf\.default\.accept_redirects" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv6\.conf\.default\.accept_redirects" /etc/sysctl.d/* || true
+
+- id: "3.2.3.a"
+  name: "sysctl reports `net.ipv4.conf.all.secure_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.all.secure_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.3.b"
+  name: "sysctl reports `net.ipv4.conf.default.secure_redirects = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.default.secure_redirects
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.3.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.all.secure_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.all\.secure_redirects" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.all\.secure_redirects" /etc/sysctl.d/* || true
+
+- id: "3.2.3.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.default.secure_redirects = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.default\.secure_redirects" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.default\.secure_redirects" /etc/sysctl.d/* || true
+
+- id: "3.2.4.a"
+  name: "sysctl reports `net.ipv4.conf.all.log_martians = 1` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.all.log_martians
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.4.b"
+  name: "sysctl reports `net.ipv4.conf.default.log_martians = 1` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.default.log_martians
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.4.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.all.log_martians = 1` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.all\.log_martians" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.all\.log_martians" /etc/sysctl.d/* || true
+
+- id: "3.2.4.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.default.log_martians = 1` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.default\.log_martians" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.default\.log_martians" /etc/sysctl.d/* || true
+
+- id: "3.2.5.a"
+  name: "sysctl reports `net.ipv4.icmp_echo_ignore_broadcasts = 1` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.icmp_echo_ignore_broadcasts
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.5.b"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.icmp_echo_ignore_broadcasts = 1` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.icmp_echo_ignore_broadcasts" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.icmp_echo_ignore_broadcasts" /etc/sysctl.d/* || true
+
+- id: "3.2.6.a"
+  name: "sysctl reports `net.ipv4.icmp_ignore_bogus_error_responses = 1` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.icmp_ignore_bogus_error_responses
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.6.b"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.icmp_ignore_bogus_error_responses = 1` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.icmp_ignore_bogus_error_responses" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.icmp_ignore_bogus_error_responses" /etc/sysctl.d/* || true
+
+- id: "3.2.7.a"
+  name: "sysctl reports `net.ipv4.conf.all.rp_filter = 1` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.all.rp_filter
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.7.b"
+  name: "sysctl reports `net.ipv4.conf.default.rp_filter = 1` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.conf.default.rp_filter
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.7.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.all.rp_filter = 1` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.all\.rp_filter" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.all\.rp_filter" /etc/sysctl.d/* || true
+
+- id: "3.2.7.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.conf.default.rp_filter = 1` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.conf\.default\.rp_filter" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.conf\.default\.rp_filter" /etc/sysctl.d/* || true
+
+- id: "3.2.8.a"
+  name: "sysctl reports `net.ipv4.tcp_syncookies = 1` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv4.tcp_syncookies
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.8.b"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv4.tcp_syncookies = 1` setting"
+  audit: |
+    grep ^\s*"net\.ipv4\.tcp_syncookies" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv4\.tcp_syncookies" /etc/sysctl.d/* || true
+
+- id: "3.2.9.a"
+  name: "sysctl reports `net.ipv6.conf.all.accept_ra = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv6.conf.all.accept_ra
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.9.b"
+  name: "sysctl reports `net.ipv6.conf.default.accept_ra = 0` setting"
+  audit: |
+    if command -v sysctl >/dev/null 2>&1; then
+      sysctl net.ipv6.conf.default.accept_ra
+    else
+      echo >&2 "sysctl: command not found"
+      exit 127
+    fi
+
+- id: "3.2.9.c"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv6.conf.all.accept_ra = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv6\.conf\.all\.accept_ra" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv6\.conf\.all\.accept_ra" /etc/sysctl.d/* || true
+
+- id: "3.2.9.d"
+  name: "/etc/sysctl.conf or /etc/sysctl.d/* contains `net.ipv6.conf.default.accept_ra = 0` setting"
+  audit: |
+    grep ^\s*"net\.ipv6\.conf\.default\.accept_ra" /etc/sysctl.conf || true
+    grep ^\s*"net\.ipv6\.conf\.default\.accept_ra" /etc/sysctl.d/* || true
+
+- id: "3.3.1"
+  name: "TCP Wrappers installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q tcp_wrappers || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s tcpd"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show tcpd"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "3.3.2"
+  name: "/etc/hosts.allow configured"
+  audit: "cat /etc/hosts.allow"
+
+- id: "3.3.3"
+  name: "/etc/hosts.deny configured"
+  audit: "cat /etc/hosts.deny"
+
+- id: "3.3.4"
+  name: "/etc/hosts.allow owned by root:root and permissions 644"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/hosts.allow"
+
+- id: "3.3.5"
+  name: "/etc/hosts.deny owned by root:root and permissions 644"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/hosts.deny"
+
+- id: "3.4.1.a"
+  name: "dccp module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v dccp
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "3.4.1.b"
+  name: "dccp module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep dccp || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 1
+    fi
+
+- id: "3.4.2.a"
+  name: "sctp module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v sctp
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "3.4.2.b"
+  name: "sctp module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep sctp || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 1
+    fi
+
+- id: "3.4.3.a"
+  name: "rds module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v rds
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "3.4.3.b"
+  name: "rds module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep rds || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 1
+    fi
+
+- id: "3.4.4.a"
+  name: "tipc module installed"
+  audit: |
+    if command -v modprobe >/dev/null 2>&1; then
+      modprobe -n -v tipc
+    else
+      echo >&2 "modprobe: command not found"
+      exit 127
+    fi
+
+- id: "3.4.4.b"
+  name: "tipc module not loaded"
+  audit: |
+    if command -v lsmod >/dev/null 2>&1; then
+      lsmod | grep tipc || true
+    else
+      echo >&2 "lsmod: command not found"
+      exit 1
+    fi
+
+- id: "3.5.1.1"
+  name: "ip6tables reports"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      ip6tables -L
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.1.2.a"
+  name: "ip6tables reports the listed rules in order for INPUT chain"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      ip6tables -L INPUT -v -n
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.1.2.b"
+  name: "ip6tables reports the listed rules in order for OUTPUT chain"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      ip6tables -L OUTPUT -v -n
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.1.3"
+  name: "Firewall Configuration - IPv6 - outbound and established connections"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      ip6tables -L -v -n
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.1.4.a"
+  name: "IPv6 outbound connections configured"
+  audit: |
+    if command -v ss >/dev/null 2>&1; then
+      ss -6tuln
+    else
+      echo >&2 "ss: command not found"
+      exit 127
+    fi
+
+- id: "3.5.1.4.b"
+  name: "IPv6 firewall rules configured"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      ip6tables -L INPUT -v -n
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.2.1"
+  name: "IPv4 default deny"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      iptables -L
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.2.2.a"
+  name: "IPv4 loopback traffic configured"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      iptables -L INPUT -v -n
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.2.2.b"
+  name: "Firewall Configuration - IPv4 - loopback traffic"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      iptables -L OUTPUT -v -n
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.2.3"
+  name: "IPv4 outbound connections configured"
+  audit: |
+    if command -v ip6tables >/dev/null 2>&1; then
+      iptables -L -v -n
+    else
+      echo >&2 "ip6tables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.2.4.a"
+  name: "IPv4 firewall rules configured"
+  audit: |
+    if command -v netstat >/dev/null 2>&1; then
+      netstat -ln
+    else
+      echo >&2 "netstat: command not found"
+      exit 127
+    fi
+
+- id: "3.5.2.4.b"
+  name: "Firewall Configuration - IPv4 - firewall rules"
+  audit: |
+    if command -v iptables >/dev/null 2>&1; then
+      iptables -L INPUT -v -n
+    else
+      echo >&2 "iptables: command not found"
+      exit 127
+    fi
+
+- id: "3.5.3"
+  name: "iptables installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q iptables || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg -s iptables"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show iptables"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "3.6.a"
+  name: "Wireless interfaces not enabled"
+  audit: |
+    if command -v iwconfig >/dev/null 2>&1; then
+      iwconfig
+    else
+      echo >&2 "iwconfig: command not found"
+      exit 127
+    fi
+
+- id: "3.6.b"
+  name: "wireless interfaces are disabled"
+  audit: |
+    if command -v ip >/dev/null 2>&1; then
+      ip link show up
+    else
+      echo >&2 "ip: command not found"
+      exit 127
+    fi
+
+- id: "3.7"
+  name: "IPv6 not enabled"
+  sub_checks:
+    - check:
+        audit: "grep \"^\\s*linux\" /boot/grub/grub.cfg | grep -v ipv6.disabled=1"
+        constraints:
+          boot:
+            - "grub"
+    - check:
+        audit: "grep \"^\\s*linux\" /boot/grub2/grub.cfg | grep -v ipv6.disabled=1"
+        constraints:
+          boot:
+            - "grub2"
+
+- id: "4.1.1.1"
+  name: "max_log_file configured"
+  audit: "grep max_log_file /etc/audit/auditd.conf"
+
+- id: "4.1.1.2.a"
+  name: "admin_space_left_action configured"
+  audit: "grep ^space_left_action /etc/audit/auditd.conf"
+
+- id: "4.1.1.2.b"
+  name: "space_left_action configured"
+  audit: "grep action_mail_acct /etc/audit/auditd.conf"
+
+- id: "4.1.1.2.c"
+  name: "action_mail_acct configured"
+  audit: "grep admin_space_left_action /etc/audit/auditd.conf"
+
+- id: "4.1.1.3"
+  name: "max_log_file_action configured"
+  audit: "grep max_log_file_action /etc/audit/auditd.conf"
+
+- id: "4.1.2"
+  name: "auditd installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q audit audit-libs || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: |
+          dpkg -s auditd || echo package auditd is not installed
+          dpkg -s audispd-plugins || echo package audispd-plugins is not installed
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-cache show auditd"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "4.1.3"
+  name: "auditd enabled"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list auditd
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled auditd
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep auditd"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "4.1.4"
+  name: "GRUB auditing enabled"
+  sub_checks:
+    - check:
+        audit: "grep \"^\\s*kernel\" /boot/grub/menu.lst"
+        constraints:
+          boot:
+            - "grub"
+    - check:
+        audit: "grep -i linux /etc/default/grub"
+        constraints:
+          boot:
+            - "grub2"
+
+- id: "4.1.5.a"
+  name: "Auditing configured for time-change events"
+  audit: "grep time-change /etc/audit/rules.d/*.rules"
+
+- id: "4.1.5.b"
+  name: "Audit Log Events - date and time"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep time-change
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.6.a"
+  name: "Auditing configured for identity events"
+  audit: "grep identity /etc/audit/rules.d/*.rules"
+
+- id: "4.1.6.b"
+  name: "Audit Log Events - user/group"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep identity
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.7.a"
+  name: "Auditing configured for system-locale events"
+  audit: "grep system-locale /etc/audit/rules.d/*.rules"
+
+- id: "4.1.7.b"
+  name: "Audit Log Events - system's network environment"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep system-locale
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.8.a"
+  name: "Auditing configured for MAC-policy events"
+  sub_checks:
+    - check:
+        audit: "grep MAC-policy /etc/audit/rules.d/*.rules"
+        constraints:
+          lsm:
+            - "selinux"
+    - check:
+        audit: "grep MAC-policy /etc/audit/rules.d/*.rules"
+        constraints:
+          lsm:
+            - "apparmor"
+
+- id: "4.1.8.b"
+  name: "Audit Log Events - system's network environment - Mandatory Access Controls"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v auditctl >/dev/null 2>&1; then
+            auditctl -l | grep MAC-policy
+          else
+            echo >&2 "auditctl: command not found"
+            exit 127
+          fi
+        constraints:
+          lsm:
+            - "selinux"
+    - check:
+        audit: |
+          if command -v auditctl >/dev/null 2>&1; then
+            auditctl -l | grep MAC-policy
+          else
+            echo >&2 "auditctl: command not found"
+            exit 127
+          fi
+        constraints:
+          lsm:
+            - "apparmor"
+
+- id: "4.1.9.a"
+  name: "Auditing configured for logins events"
+  audit: "grep logins /etc/audit/rules.d/*.rules"
+
+- id: "4.1.9.b"
+  name: "Audit Log Events - login and logout"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep logins
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.10.a"
+  name: "Auditing configured for session events"
+  audit: "grep -E '(session|logins)' /etc/audit/rules.d/*.rules"
+
+- id: "4.1.10.b"
+  name: "Audit Log Events - session initiation"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep -E '(session|logins)'
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.11.a"
+  name: "Auditing configured for perm_mod events"
+  audit: "grep perm_mod /etc/audit/rules.d/*.rules"
+
+- id: "4.1.11.b"
+  name: "Audit Log Events - access control permission modification"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep perm_mod
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.12.a"
+  name: "Auditing configured for access events"
+  audit: "grep access /etc/audit/rules.d/*.rules"
+
+- id: "4.1.12.b"
+  name: "Audit Log Events - unsuccessful unauthorized file access"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep access
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.13"
+  name: "Auditing configured for privileged events"
+  audit: "find <partition> -xdev \\( -perm -4000 -o -perm -2000 \\) -type f | awk '{print \"-a always,exit -F path=\" $1 \" -F perm=x -F auid>=500 -F auid!=4294967295  -k privileged\" }' "
+
+- id: "4.1.14.a"
+  name: "Auditing configured for mounts events"
+  audit: "grep mounts /etc/audit/rules.d/*.rules"
+
+- id: "4.1.14.b"
+  name: "Audit Log Events - file system mounts"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep mounts
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.15.a"
+  name: "Auditing configured for delete events"
+  audit: "grep delete /etc/audit/rules.d/*.rules"
+
+- id: "4.1.15.b"
+  name: "Audit Log Events - file deletion"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep delete
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.16.a"
+  name: "Auditing configured for scope events"
+  audit: "grep scope /etc/audit/rules.d/*.rules"
+
+- id: "4.1.16.b"
+  name: "Audit Log Events - system administration scope"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep scope
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.17.a"
+  name: "Auditing configured for actions events"
+  audit: "grep actions /etc/audit/rules.d/*.rules"
+
+- id: "4.1.17.b"
+  name: "Audit Log Events - system administrator actions"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep actions
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.18.a"
+  name: "Auditing configured for modules events"
+  audit: "grep modules /etc/audit/rules.d/*.rules"
+
+- id: "4.1.18.b"
+  name: "Audit Log Events - kernel module loading and unloading"
+  audit: |
+    if command -v auditctl >/dev/null 2>&1; then
+      auditctl -l | grep modules
+    else
+      echo >&2 "auditctl: command not found"
+      exit 127
+    fi
+
+- id: "4.1.19"
+  name: "/etc/audit/rules.d/*.rules ends with `-e 2` setting"
+  audit: "grep ^\\s*[^#] /etc/audit/rules.d/*.rules | tail -1"
+
+- id: "4.2.1.1"
+  name: "rsyslog installed"
+  sub_checks:
+    - check:
+        audit: "rpm -q rsyslog || echo package is not installed"
+        constraints:
+          platform:
+            - "rhel7"
+          syslog:
+            - "rsyslog"
+    - check:
+        audit: "dpkg -s rsyslog"
+        constraints:
+          platform:
+            - "ubuntu16"
+          syslog:
+            - "rsyslog"
+    - check:
+        audit: "apt-cache show rsyslog"
+        constraints:
+          platform:
+            - "ubuntu18"
+          syslog:
+            - "rsyslog"
+- id: "4.2.1.2"
+  name: "rsyslog enabled"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list rsyslog
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled rsyslog
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+            - "ubuntu16"
+            - "ubuntu18"
+    - check:
+        audit: "ls /etc/rc*.d | grep rsyslog"
+        constraints:
+          platform:
+            - "ubuntuOptional"
+
+- id: "4.2.1.3"
+  name: "/var/log/ not empty"
+  sub_checks:
+    - check:
+        audit: |
+          result=$(ls -l /var/log/)
+          printf '{"value":"%s","syslog":"rsyslog"}' "$result"
+        constraints:
+          syslog:
+            - "rsyslog"
+
+- id: "4.2.1.4"
+  name: "/etc/rsyslog.conf contains `$FileCreateMode 0640` or more restrictive setting"
+  sub_checks:
+    - check:
+        audit: "grep ^\\$FileCreateMode /etc/rsyslog.conf /etc/rsyslog.d/*.conf -h | tr \"$\" \" \" "
+        constraints:
+          syslog:
+            - "rsyslog"
+
+- id: "4.2.1.5"
+  name: "/etc/rsyslog.conf contains `*.* @@remote.log.host` setting"
+  sub_checks:
+    - check:
+        audit: "grep \"^*.*[^I][^I]*@\" /etc/rsyslog.conf /etc/rsyslog.d/*.conf"
+        constraints:
+          syslog:
+            - "rsyslog"
+
+- id: "4.2.1.6.a"
+  name: "/etc/rsyslog.conf contains `$ModLoad imtcp` setting"
+  sub_checks:
+    - check:
+        audit: "grep ^\\$ModLoad /etc/rsyslog.conf /etc/rsyslog.d/*.conf"
+        constraints:
+          syslog:
+            - "rsyslog"
+
+- id: "4.2.1.6.b"
+  name: "/etc/rsyslog.conf contains `$InputTCPServerRun` setting"
+  sub_checks:
+    - check:
+        audit: "grep ^\\$InputTCPServerRun /etc/rsyslog.conf /etc/rsyslog.d/*.conf"
+        constraints:
+          syslog:
+            - "rsyslog"
+
+- id: "4.2.2.1"
+  name: "/etc/systemd/journald.conf contains `ForwardToSyslog=yes` setting"
+  audit: "grep -e ForwardToSyslog /etc/systemd/journald.conf"
+
+- id: "4.2.2.2"
+  name: "/etc/systemd/journald.conf contains `Compress=yes` setting"
+  audit: "grep -e Compress /etc/systemd/journald.conf"
+
+- id: "4.2.2.3"
+  name: "/etc/systemd/journald.conf contains `Storage=persistent` setting"
+  audit: "grep -e Storage /etc/systemd/journald.conf"
+
+- id: "4.2.3"
+  name: "/var/log/* permissions 640 or more restrictive"
+  audit: "find /var/log -type f -ls"
+
+- id: "4.3"
+  name: "/etc/logrotate.d/* configured"
+  audit: "cat /etc/logrotate.conf; cat /etc/logrotate.d/* ;"
+
+- id: "5.1.1"
+  name: "cron is enabled"
+  sub_checks:
+    - check:
+        audit: |
+          if command -v chkconfig >/dev/null 2>&1; then
+            chkconfig --list crond
+          else
+            echo >&2 "chkconfig: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel6"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled crond
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: |
+          if command -v systemctl >/dev/null 2>&1; then
+            systemctl is-enabled cron
+          else
+            echo >&2 "systemctl: command not found"
+            exit 127
+          fi
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+
+- id: "5.1.2"
+  name: "/etc/crontab owned by root:root and permissions 600"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/crontab"
+
+- id: "5.1.3"
+  name: "/etc/cron.hourly owned by root:root and permissions 700"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/cron.hourly"
+
+- id: "5.1.4"
+  name: "/etc/cron.daily owned by root:root and permissions 700"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/cron.daily"
+
+- id: "5.1.5"
+  name: "/etc/cron.weekly owned by root:root and permissions 700"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/cron.weekly"
+
+- id: "5.1.6"
+  name: "/etc/cron.monthly owned by root:root and permissions 700"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/cron.monthly"
+
+- id: "5.1.7"
+  name: "/etc/cron.d owned by root:root and permissions 700"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/cron.d"
+
+- id: "5.1.8.a"
+  name: "Cron Configuration Permissions - /etc/cron.deny"
+  audit: 'stat /etc/cron.deny || echo "No such file or directory"'
+
+- id: "5.1.8.b"
+  name: "Cron Configuration Permissions -  /etc/at.deny"
+  audit: 'stat /etc/at.deny || echo "No such file or directory"'
+
+- id: "5.1.8.c"
+  name: "Cron Configuration Permissions - /etc/cron.allow"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/cron.allow"
+
+- id: "5.1.8.d"
+  name: "Cron Configuration Permissions - /etc/at.allow"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/at.allow"
+
+- id: "5.2.1"
+  name: "/etc/ssh/sshd_config owned by root:root and permissions 600"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/ssh/sshd_config"
+
+- id: "5.2.2"
+  name: "/etc/ssh/ssh_host_*_key owned by root:root and permissions 600"
+  audit: "find /etc/ssh -xdev -type f -name 'ssh_host_*_key' -exec stat -c \"%N permissions=%a Uid:%U/%u Gid:%G/%g\" {} \\;"
+
+- id: "5.2.3"
+  name: "/etc/ssh/ssh_host_*_key.pub owned by root:root and permissions 644"
+  audit: "find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub' -exec stat -c \"%N permissions=%a Uid:%U/%u Gid:%G/%g\" {} \\;"
+
+- id: "5.2.4"
+  name: "/etc/ssh/sshd_config contains `Protocol 2` setting"
+  audit: "grep ^Protocol /etc/ssh/sshd_config"
+
+- id: "5.2.5"
+  name: "/etc/ssh/sshd_config contains `LogLevel VERBOSE` or `LogLevel INFO` settings"
+  audit: "grep ^LogLevel /etc/ssh/sshd_config"
+
+- id: "5.2.6"
+  name: "/etc/ssh/sshd_config contains `X11Forwarding no` setting"
+  audit: "grep ^X11Forwarding /etc/ssh/sshd_config"
+
+- id: "5.2.7"
+  name: "/etc/ssh/sshd_config contains `MaxAuthTries 4` or less setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep maxauthtries
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.8"
+  name: "/etc/ssh/sshd_config contains `IgnoreRhosts yes` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep ignorerhosts
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.9"
+  name: "/etc/ssh/sshd_config contains `HostbasedAuthentication no` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep hostbasedauthentication
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.10"
+  name: "/etc/ssh/sshd_config contains `PermitRootLogin no` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep permitrootlogin
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.11"
+  name: "/etc/ssh/sshd_config contains `PermitEmptyPasswords no` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep permitemptypasswords
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.12"
+  name: "/etc/ssh/sshd_config contains `PermitUserEnvironment no` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep permituserenvironment
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.13"
+  name: "/etc/ssh/sshd_config contains `Ciphers` setting with only secure ciphers"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep ciphers
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.14"
+  name: "/etc/ssh/sshd_config contains `MACs` setting with only approved MACs"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep -i \"MACs\"
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.15"
+  name: "/etc/ssh/sshd_config contains `KexAlgorithms` setting with only approved key exchange algorithms"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep kexalgorithms
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.16.a"
+  name: "/etc/ssh/sshd_config contains `ClientAliveInterval 300` or less setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep clientaliveinterval
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.16.b"
+  name: "/etc/ssh/sshd_config contains `ClientAliveCountMax 3` or less setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep clientalivecountmax
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.17"
+  name: "/etc/ssh/sshd_config contains `LoginGraceTime 60` or less setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep logingracetime
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.18.a"
+  name: "/etc/ssh/sshd_config contains `AllowUsers` settings"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep allowusers
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.18.b"
+  name: "/etc/ssh/sshd_config contains `AllowGroups` settings"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep allowgroups
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.18.c"
+  name: "/etc/ssh/sshd_config contains `DenyUsers` settings"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep denyusers
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.18.d"
+  name: "/etc/ssh/sshd_config contains `DenyGroups` settings"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep denygroups
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.19"
+  name: "/etc/ssh/sshd_config contains `Banner /etc/issue.net` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep banner
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.20"
+  name: "/etc/ssh/sshd_config contains `UsePAM yes` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep -i usepam
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.21"
+  name: "/etc/ssh/sshd_config contains `AllowTcpForwarding no` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep -i allowtcpforwarding
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.22"
+  name: "/etc/ssh/sshd_config contains `maxstartups 10:30:60` setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep -i maxstartups
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.2.23"
+  name: "/etc/ssh/sshd_config contains `MaxSessions 4` or less setting"
+  audit: |
+    if command -v sshd >/dev/null 2>&1; then
+      sshd -T | grep -i maxsessions
+    else
+      echo >&2 "sshd: command not found"
+      exit 127
+    fi
+
+- id: "5.3.1"
+  name: "/etc/pam.d/common-password, /etc/pam.d/system-auth, or /etc/security/pwquality.conf contains `minlen=14` or more, `retry=3` or less, `try_first_pass`, `dcredit=-1`, `ucredit=-1`, `ocredit=-1`, and `lcredit=-1` settings"
+  audit: "cat /etc/pam.d/common-password; cat /etc/pam.d/system-auth"
+
+- id: "5.3.2"
+  name: "/etc/pam.d/common-auth contains `auth required pam_tally2.so onerr=fail audit silent deny=5 unlock_time=900` or more restrictive settings and /etc/pam.d/system-auth, or /etc/pam.d/password-auth contains a `pam_unix.so` line surrounded by `pam_faillock.so` lines"
+  audit: "cat /etc/pam.d/system-auth; cat /etc/pam.d/password-auth; cat /etc/pam.d/common-auth"
+
+- id: "5.3.3"
+  name: "/etc/pam.d/common-password, or /etc/pam.d/system-auth contains `password required pam_pwhistory.so remember=5` or more, and `password sufficient pam_unix.so remember=5` or more settings"
+  audit: "cat /etc/pam.d/common-password; cat /etc/pam.d/system-auth"
+
+- id: "5.3.4"
+  name: "/etc/pam.d/common-password, /etc/pam.d/system-auth, or /etc/pam.d/password-auth contains `password sufficient pam_unix.so sha512` setting"
+  audit: |
+    grep -E ^[^#].*sha512 /etc/pam.d/common-password || true
+    grep -E ^[^#].*sha512 /etc/pam.d/system-auth || true
+    grep -E ^[^#].*sha512 /etc/pam.d/password-auth || true
+
+- id: "5.4.1.1.a"
+  name: "/etc/login.defs contains `PASS_MAX_DAYS 365` or less setting"
+  audit: "grep ^PASS_MAX_DAYS /etc/login.defs"
+
+- id: "5.4.1.1.b"
+  name: "/etc/shadow all passwords expire in 365 days or less"
+  audit: "grep -E '^[^:]+:[^!*]' /etc/shadow | cut -d: -f1,5"
+
+- id: "5.4.1.2.a"
+  name: "/etc/login.defs contains `PASS_MIN_DAYS 7` or more setting"
+  audit: "grep ^PASS_MIN_DAYS /etc/login.defs"
+
+- id: "5.4.1.2.b"
+  name: "/etc/shadow all passwords cannot be updated in 7 days or more"
+  audit: "grep -E ^[^:]+:[^\\!*] /etc/shadow | cut -d: -f1,4"
+
+- id: "5.4.1.3.a"
+  name: "/etc/login.defs contains `PASS_WARN_AGE 7` or more setting"
+  audit: "grep ^PASS_WARN_AGE /etc/login.defs"
+
+- id: "5.4.1.3.b"
+  name: "/etc/shadow all passwords have a warning in 7 days or more"
+  audit: "grep -E ^[^:]+:[^\\!*] /etc/shadow | cut -d: -f1,6"
+
+- id: "5.4.1.4.a"
+  name: "/etc/default/useradd contains `INACTIVE=30` or less setting"
+  audit: "useradd -D | grep INACTIVE"
+
+- id: "5.4.1.4.b"
+  name: "/etc/shadow all users go inactive in 30 days or less"
+  audit: "grep -E ^[^:]+:[^\\!*] /etc/shadow | cut -d: -f1,7"
+
+- id: "5.4.1.5"
+  name: "All users `Last password change` are in the past"
+  audit: "#!/bin/bash\nfor usr in $(cut -d: -f1 /etc/shadow | sort -u ); do\n        p=$(chage --list $usr | grep '^Last password change' | cut -d: -f2)\n        today=$(date +'%b %d %Y')\n        if [ $(date --date=\"$p\" +%s) -gt $(date --date=\"$today\" +%s) ]; then\n            echo \"$usr : $p\"\n        fi\n        done\n"
+
+- id: "5.4.2.a"
+  name: "All system accounts have assigned non login shell"
+  audit: "awk -F: '($1!=\"root\" && $1!=\"sync\" && $1!=\"shutdown\" && $1!=\"halt\" && $1!~/^\\+/ && $3<'\"$(awk '/^\\s*UID_MIN/{print $2}' /etc/login.defs)\"' && $7!=\"'\"$(which nologin)\"'\" && $7!=\"/bin/false\") {print}' /etc/passwd"
+
+- id: "5.4.2.b"
+  name: "All system accounts have a locked password"
+  audit: "awk -F: '($1!=\"root\" && $1!~/^\\+/ && $3<'\"$(awk '/^\\s*UID_MIN/{print $2}' /etc/login.defs)\"') {print $1}' /etc/passwd | xargs -I '{}' passwd -S '{}' | awk '($2!=\"L\" && $2!=\"LK\") {print $1}'"
+
+- id: "5.4.3"
+  name: "Group ID for root is 0"
+  audit: "grep ^root: /etc/passwd | cut -f4 -d:"
+
+- id: "5.4.4.a"
+  name: "/etc/bashrc, or /etc/bash.bashrc contains `umask 027` or more restrictive setting"
+  sub_checks:
+    - check:
+        audit: "grep umask /etc/bashrc"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "grep umask /etc/bash.bashrc"
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+
+- id: "5.4.4.b"
+  name: "/etc/profile, or /etc/profile.d/*.sh contains `umask 027` or more restrictive setting"
+  audit: "grep -h umask /etc/profile /etc/profile.d/*.sh"
+
+- id: "5.4.5.a"
+  name: "/etc/bashrc, or /etc/bash.bashrc contains `TMOUT 900` or less setting"
+  sub_checks:
+    - check:
+        audit: "grep ^TMOUT /etc/bashrc"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "grep ^TMOUT /etc/bash.bashrc"
+        constraints:
+          platform:
+            - "ubuntu16"
+            - "ubuntu18"
+
+- id: "5.4.5.b"
+  name: "/etc/profile contains `TMOUT 900` or less setting"
+  audit: "grep ^TMOUT /etc/profile"
+
+- id: "5.5"
+  name: "Valid terminals that may be logged in as root"
+  audit: "cat /etc/securetty"
+
+- id: "5.6.a"
+  name: "/etc/pam.d/su contains `auth required pam_wheel.so use_uid` setting"
+  audit: "grep pam_wheel.so /etc/pam.d/su"
+
+- id: "5.6.b"
+  name: "/etc/group contains `wheel:x:10:root,<user list>` setting"
+  audit: "grep wheel /etc/group"
+
+- id: "6.1.1"
+  name: "Audit system file permissions"
+  sub_checks:
+    - check:
+        audit: "rpm -Va --nomtime --nosize --nomd5 --nolinkto > <filename>"
+        constraints:
+          platform:
+            - "rhel7"
+    - check:
+        audit: "dpkg --verify > <filename>"
+        constraints:
+          platform:
+            - "ubuntu16"
+    - check:
+        audit: "apt-get source > <filename>"
+        constraints:
+          platform:
+            - "ubuntu18"
+
+- id: "6.1.2"
+  name: "/etc/passwd owned by root:root and permissions 644"
+  audit: "stat -c %a/Uid:%U/%uGid:%G/%g /etc/passwd"
+
+- id: "6.1.3"
+  name: "/etc/shadow owned by root:root or root:shadow and permissions 640"
+  audit: "stat -c \"Uid:%U/%u Gid:%G permissions=%a\" /etc/shadow"
+
+- id: "6.1.4"
+  name: "/etc/group owned by root:root and 644 permissions"
+  audit: "stat -c \"Uid:%U/%u Gid:%G/%g permissions=%a\" /etc/group"
+
+- id: "6.1.5"
+  name: "/etc/gshadow owned by root:root or root:shadow and 640 permissions"
+  audit: "stat -c \"Uid:%U/%u Gid:%G permissions=%a\" /etc/gshadow"
+
+- id: "6.1.6"
+  name: "/etc/passwd- owned by root:root and 630 permissions"
+  audit: "stat -c \"Uid:%U/%u Gid:%G/%g permissions=%a\" /etc/passwd-"
+
+- id: "6.1.7"
+  name: "/etc/shadow- owned by root:root or root:shadow and 640 permissions"
+  audit: "stat -c \"Uid:%U/%u Gid:%G permissions=%a\" /etc/shadow-"
+
+- id: "6.1.8"
+  name: "/etc/group- owned by root:root and 6400 permissions"
+  audit: "stat -c \"Uid:%U/%u Gid:%G/%g permissions=%a\" /etc/group-"
+
+- id: "6.1.9"
+  name: "/etc/gshadow- owned by root:root or root:shadow and 640 permissions"
+  audit: "stat -c \"Uid:%U/%u Gid:%G permissions=%a\" /etc/gshadow-"
+
+- id: "6.1.10.a"
+  name: "No files in local filesystems have permissions -0002"
+  audit: "df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -0002 | head -n 100"
+
+- id: "6.1.10.b"
+  name: "System File Permissions - world writable files"
+
+- id: "6.1.11.a"
+  name: "All files in local filesystems have owner"
+  audit: "df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser | head -n 100"
+
+- id: "6.1.11.b"
+  name: "System File Permissions - unowned files or directories"
+
+- id: "6.1.12.a"
+  name: "All files in local filesystems have group"
+  audit: "df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup | head -n 100"
+
+- id: "6.1.12.b"
+  name: "System File Permissions - ungrouped files or directories"
+
+- id: "6.1.13.a"
+  name: "Audit files in local filesystems with permissions -4000"
+  audit: "df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -4000 | head -n 100"
+
+- id: "6.1.13.b"
+  name: "System File Permissions - Audit SUID"
+
+- id: "6.1.14.a"
+  name: "Audit files in local filesystems with permissions -2000"
+  audit: "df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -type f -perm -2000 | head -n 100"
+
+- id: "6.1.14.b"
+  name: "System File Permissions - Audit SGID"
+
+- id: "6.2.1"
+  name: "/etc/shadow contains passwords for all users"
+  audit: "awk -F: '($2 == \"\" ) { print $1 \" does not have a password \"}' /etc/shadow"
+
+- id: "6.2.2"
+  name: "/etc/passwd does not contain '+' entries"
+  audit: "grep '^\\+:' /etc/passwd || true"
+
+- id: "6.2.3"
+  name: "/etc/shadow does not contain '+' entries"
+  audit: "grep '^\\+:' /etc/shadow || true"
+
+- id: "6.2.4"
+  name: "/etc/group does not contain '+' entries"
+  audit: "grep '^\\+:' /etc/group || true"
+
+- id: "6.2.5"
+  name: "/etc/passwd contains only root as UID 0"
+  audit: "awk -F: '($3 == 0) { print $1 }' /etc/passwd"
+
+- id: "6.2.6"
+  name: "root's PATH does not contain '.' or directories not owned by root"
+  audit: |
+    #!/bin/bash
+    if [ "$(echo "$PATH" | grep ::)" != "" ]; then
+            echo "Empty Directory in PATH (::)"
+    fi
+
+    if [ "$(echo "$PATH" | grep :$)" != "" ]; then
+            echo "Trailing : in PATH"
+    fi
+
+    p=$(echo "$PATH" | sed -e 's/::/:/' -e 's/:$//' -e 's/:/ /g')
+    set -- $p
+    while [ "$1" != "" ]; do
+            if [ "$1" = "." ]; then
+                    shift
+                    continue
+            fi
+            if [ -d "$1" ]; then
+                    dirperm=$(ls -ldH "$1" | cut -f1 -d" ")
+                    if [ "$(echo "$dirperm" | cut -c6)" != "-" ]; then
+                            echo "Group Write permission set on directory $1"
+                    fi
+                    if [ "$(echo "$dirperm" | cut -c9)" != "-" ]; then
+                            echo "Other Write permission set on directory $1"
+                    fi
+                    dirown=$(ls -ldH "$1" | awk '{print $3}')
+                    if [ "$dirown" != "root" ] ; then
+                            echo "$1 is not owned by root"
+                    fi
+            else
+                    echo "$1 is not a directory"
+            fi
+            shift
+    done
+
+- id: "6.2.7"
+  name: "All users accounts have a home directory that actually exists"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' |
+            while read -r user dir; do
+                    if [ ! -d "$dir" ]; then
+                            echo "The home directory ($dir) of user $user does not exist."
+                    fi
+            done
+
+- id: "6.2.8"
+  name: "All users accounts have a home directory with permissions 750 or more restrictive"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' |
+    while read user dir; do
+        if [ ! -d "$dir" ]; then
+            echo "The home directory ($dir) of user $user does not exist."
+        else
+            dirperm=$(ls -ld $dir | cut -f1 -d" ")
+            if [ $(echo $dirperm | cut -c6) != "-" ]; then
+                echo "Group Write permission set on the home directory ($dir) of user $user"
+            fi
+            if [ $(echo $dirperm | cut -c8) != "-" ]; then
+                echo "Other Read permission set on the home directory ($dir) of user $user"
+            fi
+            if [ $(echo $dirperm | cut -c9) != "-" ]; then
+                echo "Other Write permission set on the home directory ($dir) of user $user"
+            fi
+            if [ $(echo $dirperm | cut -c10) != "-" ]; then
+                echo "Other Execute permission set on the home directory ($dir) of user $user"
+            fi
+        fi
+    done
+
+- id: "6.2.9"
+  name: "All users accounts have a home directory owned by the user"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' | while read user dir; do
+            if [ ! -d "$dir" ]; then
+                    echo "The home directory ($dir) of user $user does not exist."
+            else
+            owner=$(stat -L -c "%U" "$dir")
+                    if [ "$owner" != "$user" ]; then
+                    echo "The home directory ($dir) of user $user is owned by $owner."
+                    fi
+            fi
+    done
+
+- id: "6.2.10"
+  name: "All users accounts have a dot files with permissions 644 or more restrictive"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' | while read user dir; do
+            if [ ! -d "$dir" ]; then
+                    echo "The home directory ($dir) of user $user does not exist."
+            else
+                    for file in $dir/.[A-Za-z0-9]*; do
+                            if [ ! -h "$file" -a -f "$file" ]; then
+                                    fileperm=$(ls -ld $file | cut -f1 -d" ")
+                                            if [ $(echo $fileperm | cut -c6) != "-" ]; then
+                                                    echo "Group Write permission set on file $file"
+                                            fi
+                                            if [ $(echo $fileperm | cut -c9) != "-" ]; then
+                                                    echo "Other Write permission set on file $file"
+                                    fi
+                            fi
+                    done
+            fi
+    done
+
+- id: "6.2.11"
+  name: "No users with .forward files"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' | while read user dir; do
+            if [ ! -d "$dir" ]; then
+                    echo "The home directory ($dir) of user $user does not exist."
+            else
+                    if [ ! -h "$dir/.forward" -a -f "$dir/.forward" ]; then
+                            echo ".forward file $dir/.forward exists"
+                    fi
+            fi
+    done
+
+- id: "6.2.12"
+  name: "No users with .netrc files"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' | while read user dir; do
+            if [ ! -d "$dir" ]; then
+                    echo "The home directory ($dir) of user $user does not exist."
+            else
+                    if [ ! -h "$dir/.netrc" -a -f "$dir/.netrc" ]; then
+                            echo ".netrc file $dir/.netrc exists"
+                    fi
+            fi
+    done
+
+- id: "6.2.13"
+  name: "Users' .netrc files permissions 600 or more restrictive"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' | while read user dir; do
+    if [ ! -d "$dir" ]; then
+            echo "The home directory ($dir) of user $user does not exist."
+    else
+            for file in $dir/.netrc; do
+                    if [ ! -h "$file" -a -f "$file" ]; then
+                            fileperm=$(ls -ld $file | cut -f1 -d" ")
+                            if [ $(echo $fileperm | cut -c5) != "-" ]; then
+                                    echo "Group Read set on $file"
+                            fi
+                            if [ $(echo $fileperm | cut -c6) != "-" ]; then
+                                    echo "Group Write set on $file"
+                            fi
+                            if [ $(echo $fileperm | cut -c7) != "-" ]; then
+                                    echo "Group Execute set on $file"
+                            fi
+                            if [ $(echo $fileperm | cut -c8) != "-" ]; then
+                                    echo "Other Read set on $file"
+                            fi
+                            if [ $(echo $fileperm | cut -c9) != "-" ]; then
+                                    echo "Other Write set on $file"
+                            fi
+                            if [ $(echo $fileperm | cut -c10) != "-" ]; then
+                                    echo "Other Execute set on $file"
+                            fi
+                    fi
+            done
+    fi
+    done
+
+- id: "6.2.14"
+  name: "No users with .rhosts files"
+  audit: |
+    #!/bin/bash
+    grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '($7 != "'"$(which nologin)"'" && $7 != "/bin/false") { print $1 " " $6 }' | while read user dir; do
+    if [ ! -d "$dir" ]; then
+            echo "The home directory ($dir) of user $user does not exist."
+    else
+            for file in $dir/.rhosts; do
+                    if [ ! -h "$file" -a -f "$file" ]; then
+                            echo ".rhosts file in $dir"
+                    fi
+            done
+    fi
+    done
+
+- id: "6.2.15"
+  name: "All groups in /etc/passwd exist in /etc/group"
+  audit: |
+    #!/bin/bash
+    for i in $(cut -s -d: -f4 /etc/passwd | sort -u ); do
+            grep -q -P "^.*?:[^:]*:$i:" /etc/group
+            if [ $? -ne 0 ]; then
+                    echo "Group $i is referenced by /etc/passwd but does not exist in /etc/group"
+            fi
+    done
+
+- id: "6.2.16"
+  name: "/etc/passwd contains no duplicate UIDs"
+  audit: |
+    #!/bin/bash
+    cut -f3 -d":" /etc/passwd | sort -n | uniq -c | while read x ; do
+            [ -z "$x" ] && break
+            set - $x
+            if [ $1 -gt 1 ]; then
+                    users=$(awk -F: '($3 == n) { print $1 }' n=$2 /etc/passwd | xargs)
+                    echo "Duplicate UID ($2): $users"
+            fi
+            done
+
+- id: "6.2.17"
+  name: "/etc/group contains no duplicate GIDs"
+  audit: |
+    #!/bin/bash
+    cut -f3 -d":" /etc/group | sort -n | uniq -c | while read x ; do
+    [ -z "$x" ] && break
+    set - $x
+    if [ $1 -gt 1 ]; then
+            groups=$(awk -F: '($3 == n) { print $1 }' n=$2 /etc/group | xargs)
+            echo "Duplicate GID ($2): $groups"
+    fi
+    done
+
+- id: "6.2.18"
+  name: "/etc/passwd contains no duplicate user names"
+  audit: |
+    #!/bin/bash
+    cut -f1 -d":" /etc/passwd | sort -n | uniq -c | while read x ; do
+            [ -z "$x" ] && break
+            set - $x
+            if [ $1 -gt 1 ]; then
+                    uids=$(awk -F: '($1 == n) { print $3 }' n=$2 /etc/passwd | xargs)
+                    echo "Duplicate User Name ($2): $uids"
+            fi
+            done
+
+- id: "6.2.19"
+  name: "/etc/group contains no duplicate group names"
+  audit: |
+    #!/bin/bash
+    cut -f1 -d":" /etc/group | sort -n | uniq -c | while read x ; do
+            [ -z "$x" ] && break
+            set - $x
+            if [ $1 -gt 1 ]; then
+                    gids=$(gawk -F: '($1 == n) { print $3 }' n=$2 /etc/group | xargs)
+                    echo "Duplicate Group Name ($2): $gids"
+            fi
+            done
+
+- id: "6.2.20.a"
+  name: "/etc/group contains no duplicate group names"
+  audit: "grep ^shadow:[^:]*:[^:]*:[^:]+ /etc/group || true"
+
+- id: "6.2.20.b"
+  name: "shadow group is empty"
+  audit: "awk -F: '($4 == \"\") { print }' /etc/passwd"
