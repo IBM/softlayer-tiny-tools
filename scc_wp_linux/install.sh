@@ -47,14 +47,14 @@ install_host_analyzer() {
 
 # Check or install agent service
 if pgrep -x "dragent" >/dev/null; then
-    echo "The service 'dragent' is running. skill install"
+    echo "The service 'dragent' is running. skip install"
 else
     install_agent
 fi
 
 # Check or install host_analyzer service
 if pgrep -x "host_analyzer" >/dev/null; then
-    echo "The service 'host_analyzer' is running. skill install"
+    echo "The service 'host_analyzer' is running. skip install"
 else
     install_host_analyzer
 fi
