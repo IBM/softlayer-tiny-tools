@@ -51,9 +51,9 @@ install_kspm_analyzer() {
         cp -r ./kspm-analyzer/binaries /
     fi
     AM_COLLECTOR_ENDPOINT=$API_ENDPOINT
-    ./check_env.sh API_ENDPOINT $API_ENDPOINT /etc/kspm_analyzer.env
-    ./check_env.sh ACCESS_KEY $ACCESS_KEY /etc/kspm_analyzer.env
-    ./check_env.sh HOST_ROOT_PATH / /etc/kspm_analyzer.env
+    ./check_env.sh API_ENDPOINT $API_ENDPOINT /etc/kspm-analyzer.env
+    ./check_env.sh ACCESS_KEY $ACCESS_KEY /etc/kspm-analyzer.env
+    ./check_env.sh HOST_ROOT_PATH / /etc/kspm-analyzer.env
     ./create_kspm_analyzer_service.sh
     service host_analyzer start
     service host_analyzer enable

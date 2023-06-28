@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Service name and description
-SERVICE_NAME="kspm_analyzer"
+SERVICE_NAME="kspm-analyzer"
 SERVICE_DESC="KSPM Analyzer Service"
 
 # Path to your program
-PROGRAM_PATH="/bin/kspm_analyzer"
+PROGRAM_PATH="/bin/kspm-analyzer"
 
 # Service script path
 SERVICE_SCRIPT="/etc/init.d/$SERVICE_NAME"
@@ -34,12 +34,12 @@ start() {
 # Function to stop the service
 stop() {
     echo "Stopping $SERVICE_DESC..."
-    killall -9 kspm_analyzer
+    killall -9 kspm-analyzer
 }
 
 # Function to check the status of the service
 status() {
-    if pgrep kspm_analyzer >/dev/null; then
+    if pgrep kspm-analyzer >/dev/null; then
         echo "$SERVICE_DESC is running."
     else
         echo "$SERVICE_DESC is not running."
@@ -53,7 +53,7 @@ enable() {
 }
 
 # Environment variable
-source /etc/kspm_analyzer.env
+source /etc/kspm-analyzer.env
 
 case "\$1" in
     start)
