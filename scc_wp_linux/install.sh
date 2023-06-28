@@ -40,15 +40,14 @@ install_host_analyzer() {
 
 # INSTALL AND RUNN kspm-analyzer
 install_kspm_analyzer() {
-    echo "start install host analyzer...."
-    export HOST_ROOT_PATH=/
-    if [ -f /bin/kspm-analyzer ]; then
+    echo "start install kspm analyzer...."
+    if [ ! -f /bin/kspm-analyzer ]; then
         cp ./kspm-analyzer/bin/kspm-analyzer /bin
     fi
-    if [ -f ./kspm-analyzer/configs ]; then
+    if [ ! -f ./kspm-analyzer/configs ]; then
         cp -r ./kspm-analyzer/configs /
     fi
-    if  [ -f ./kspm-analyzer/binaries ]; then
+    if  [ ! -f ./kspm-analyzer/binaries ]; then
     cp ./kspm-analyzer/binaries /
     fi
     AM_COLLECTOR_ENDPOINT=$API_ENDPOINT
