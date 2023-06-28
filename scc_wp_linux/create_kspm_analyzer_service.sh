@@ -28,7 +28,7 @@ create_service_script() {
 # Function to start the service
 start() {
     echo "Starting $SERVICE_DESC..."
-    $PROGRAM_PATH &
+      $PROGRAM_PATH >> /var/log/kspm_analyzer_svg.log 2>&1 &
 }
 
 # Function to stop the service
