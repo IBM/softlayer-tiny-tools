@@ -48,7 +48,7 @@ case "\$1" in
         stop
         ;;
     status)
-        systemctl restart host_analyzer
+        systemctl status host_analyzer
         ;;
     restart)
         stop
