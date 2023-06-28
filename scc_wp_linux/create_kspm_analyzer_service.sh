@@ -46,12 +46,6 @@ status() {
     fi
 }
 
-# Function to enable service auto-start
-enable() {
-    echo "Enabling $SERVICE_DESC auto-start..."
-    update-rc.d $SERVICE_NAME defaults
-}
-
 # Environment variable
 source /etc/kspm-analyzer.env
 
@@ -65,15 +59,12 @@ case "\$1" in
     status)
         status
         ;;
-    enable)
-        enable
-        ;;
     restart)
         stop
         start
         ;;
     *)
-        echo "Usage: \$0 {start|stop|restart|status|enable}"
+        echo "Usage: \$0 {start|stop|restart|status}"
         exit 1
         ;;
 esac
