@@ -37,15 +37,6 @@ stop() {
     killall -9 kspm-analyzer
 }
 
-# Function to check the status of the service
-status() {
-    if pgrep kspm-analyzer >/dev/null; then
-        echo "$SERVICE_DESC is running."
-    else
-        echo "$SERVICE_DESC is not running."
-    fi
-}
-
 # Environment variable
 source /etc/kspm-analyzer.env
 
@@ -57,7 +48,7 @@ case "\$1" in
         stop
         ;;
     status)
-        status
+        systemctl restart host_analyzer
         ;;
     restart)
         stop
