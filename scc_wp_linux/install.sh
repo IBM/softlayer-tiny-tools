@@ -48,7 +48,7 @@ install_kspm_analyzer() {
         cp -r ./kspm-analyzer/configs /
     fi
     if  [ ! -f ./kspm-analyzer/binaries ]; then
-    cp ./kspm-analyzer/binaries /
+        cp -r ./kspm-analyzer/binaries /
     fi
     AM_COLLECTOR_ENDPOINT=$API_ENDPOINT
     ./check_env.sh API_ENDPOINT $API_ENDPOINT /etc/kspm_analyzer.env
