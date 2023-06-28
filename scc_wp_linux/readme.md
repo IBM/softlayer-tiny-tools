@@ -3,7 +3,7 @@
 #### set env
 ```sh
 export ACCESS_KEY=<replace-access-key>
-export API_ENDPOINT=<replace-endpoint>
+export API_ENDPOINT=<region>.security-compliance-secure.cloud.ibm.com
 export TAGS=<your-tag-with-format-"setup:test,os:centos6,project:roe,location:us,role:ops">
 ```
 
