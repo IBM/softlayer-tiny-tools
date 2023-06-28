@@ -15,7 +15,7 @@ install_agent() {
     -c ingest.${API_ENDPOINT} --collector_port 6443 --secure true -ac \"sysdig_capture_enabled: false\""
 
     # Check if TAGS environment variable is set
-    if [ -z "$TAGS" ]; then
+    if [ ! -z "$TAGS" ]; then
         # Install agent with tags
         install_command+=" --tags ${TAGS}"
     fi
