@@ -30,19 +30,34 @@ install_host_analyzer() {
     echo "start install host analyzer...."
     cp ./host_analyzer /usr/bin/
     chmod +x /usr/bin/host_analyzer
-
-    AM_COLLECTOR_ENDPOINT=$API_ENDPOINT
-    ./check_env.sh AM_COLLECTOR_ENDPOINT "https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector" /etc/host_analyzer.env
+    ./check_env.sh API_ENDPOINT "https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector" /etc/host_analyzer.env
     ./check_env.sh SCHEDULE "@dailydefault"  /etc/host_analyzer.env
     ./check_env.sh ACCESS_KEY $ACCESS_KEY /etc/host_analyzer.env
     ./create_host_analyzer_service.sh
     service host_analyzer start
     service host_analyzer enable
+}
 
-    # INSTALL AND RUNN kspm-analyzer
+# INSTALL AND RUNN kspm-analyzer
+install_kspm_analyzer() {
+    echo "start install host analyzer...."
     export HOST_ROOT_PATH=/
-    cp -rf ./ksmp-analyzer /root/
-    cd /root/ksmp-analyzer 
+    if [ -f /bin/kspm-analyzer ]; then
+        cp ./kspm-analyzer/bin/kspm-analyzer /bin
+    fi
+    if [ -f ./kspm-analyzer/configs ]; then
+        cp -r ./kspm-analyzer/configs /
+    fi
+    if  [ -f ./kspm-analyzer/binaries ]; then
+    cp ./kspm-analyzer/binaries /
+    fi
+    AM_COLLECTOR_ENDPOINT=$API_ENDPOINT
+    ./check_env.sh API_ENDPOINT $API_ENDPOINT /etc/kspm_analyzer.env
+    ./check_env.sh ACCESS_KEY $ACCESS_KEY /etc/kspm_analyzer.env
+    ./check_env.sh HOST_ROOT_PATH / /etc/kspm_analyzer.env
+    ./create_kspm_analyzer_service.sh
+    service host_analyzer start
+    service host_analyzer enable
 }
 
 # Check or install agent service
@@ -60,7 +75,7 @@ fi
 
 # Check or install host_analyzer service
 HOST_ANALYZER_SERVICE_SCRIPT="/etc/init.d/host_analyzer"
-if [ -f "/etc/init.d/HOST_ANALYZER_SERVICE_SCRIPT" ]; then
+if [ -f $HOST_ANALYZER_SERVICE_SCRIPT ]; then
     echo "$HOST_ANALYZER_SERVICE_SCRIPT Service script already exists."
     if pgrep -x "host_analyzer" >/dev/null; then
         echo "The service 'host_analyzer' is running. skip install"
@@ -69,7 +84,20 @@ if [ -f "/etc/init.d/HOST_ANALYZER_SERVICE_SCRIPT" ]; then
     fi
 else 
     install_host_analyzer
-fi 
+fi
+
+# Check or install kspm_analyzer service
+KSPM_ANALYZER_SERVICE_SCRIPT="/etc/init.d/kspm_analyzer"
+if [ -f $KSPM_ANALYZER_SERVICE_SCRIPT ]; then
+    echo "$KSPM_ANALYZER_SERVICE_SCRIPT Service script already exists."
+    if pgrep -x "kspm_analyzer" >/dev/null; then
+        echo "The service 'kspm_analyzer' is running. skip install"
+    else
+        service kspm_analyzer start
+    fi
+else 
+    install_kspm_analyzer
+fi
 
 
 
