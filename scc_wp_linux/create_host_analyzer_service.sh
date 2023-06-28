@@ -37,6 +37,11 @@ stop() {
     killall -9 host_analyzer
 }
 
+# Environment variables
+AM_COLLECTOR_ENDPOINT="https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector"
+SCHEDULE="@dailydefault" 
+ACCESS_KEY=$ACCESS_KEY
+
 case "\$1" in
     start)
         start
