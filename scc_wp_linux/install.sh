@@ -55,8 +55,8 @@ install_kspm_analyzer() {
     ./check_env.sh ACCESS_KEY $ACCESS_KEY /etc/kspm-analyzer.env
     ./check_env.sh HOST_ROOT_PATH / /etc/kspm-analyzer.env
     ./create_kspm_analyzer_service.sh
-    service host_analyzer start
-    service host_analyzer enable
+    service kspm-analyzer start
+    service kspm-analyzer enable
 }
 
 # Check or install agent service

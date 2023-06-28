@@ -12,7 +12,7 @@ SERVICE_SCRIPT="/etc/init.d/$SERVICE_NAME"
 
 # Create the service script
 create_service_script() {
-    echo "Creating service script..."
+    echo "Creating KSPM Analyzer service script..."
     cat << EOF > $SERVICE_SCRIPT
 #!/bin/bash
 ### BEGIN INIT INFO
