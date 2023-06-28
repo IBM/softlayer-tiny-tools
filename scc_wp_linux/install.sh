@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Check if ACCESS_KEY and API_ENDPOINT environment variables are set
 if [ -z "$ACCESS_KEY" ] || [ -z "$API_ENDPOINT" ]; then
@@ -8,6 +9,7 @@ fi
 
 # INSTALL AND RUNN AGENT
 install_agent() {
+    echo "start install agent...."
     # Define the base command for installing the agent
     install_command="curl -sL https://ibm.biz/install-sysdig-agent | sudo bash -s -- -a ${ACCESS_KEY} \
     -c ingest.${API_ENDPOINT} --collector_port 6443 --secure true -ac \"sysdig_capture_enabled: false\""
@@ -20,16 +22,18 @@ install_agent() {
 
     # Execute the installation command
     eval "$install_command"
+    echo "install completed...."
 }
 
 install_host_analyzer() {
-    # INSTALL AND RUNN HOST ANALYZER 
-    cp ./host_analyzer /user/bin/
-    chmod +x /user/bin/host_analyzer
+    # INSTALL AND RUNN HOST ANALYZER
+    echo "start install host analyzer...."
+    cp ./host_analyzer /usr/bin/
+    chmod +x /usr/bin/host_analyzer
 
     AM_COLLECTOR_ENDPOINT=$API_ENDPOINT
-    export AM_COLLECTOR_ENDPOINT=https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector
-    export SCHEDULE=@dailydefault 
+    check_env.sh AM_COLLECTOR_ENDPOINT "https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector"
+    check_env.sh SCHEDULE "@dailydefault" 
     ./create_host_analyzer_service.sh
     service host_analyzer start
     service host_analyzer enable
