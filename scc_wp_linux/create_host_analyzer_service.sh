@@ -37,10 +37,23 @@ stop() {
     killall -9 host_analyzer
 }
 
-# Environment variables
-AM_COLLECTOR_ENDPOINT="https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector"
-SCHEDULE="@dailydefault" 
-ACCESS_KEY=$ACCESS_KEY
+# Function to check the status of the service
+status() {
+    if pgrep host_analyzer >/dev/null; then
+        echo "$SERVICE_DESC is running."
+    else
+        echo "$SERVICE_DESC is not running."
+    fi
+}
+
+# Function to enable service auto-start
+enable() {
+    echo "Enabling $SERVICE_DESC auto-start..."
+    update-rc.d $SERVICE_NAME defaults
+}
+
+# Environment variable
+source /etc/host_analyzer.env
 
 case "\$1" in
     start)
@@ -49,12 +62,18 @@ case "\$1" in
     stop)
         stop
         ;;
+    status)
+        status
+        ;;
+    enable)
+        enable
+        ;;
     restart)
         stop
         start
         ;;
     *)
-        echo "Usage: \$0 {start|stop|restart}"
+        echo "Usage: \$0 {start|stop|restart|status|enable}"
         exit 1
         ;;
 esac
