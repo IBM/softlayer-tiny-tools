@@ -10,18 +10,6 @@ PROGRAM_PATH="/usr/bin/host_analyzer"
 # Service script path
 SERVICE_SCRIPT="/etc/init.d/$SERVICE_NAME"
 
-# Function to start the service
-start() {
-    echo "Starting $SERVICE_DESC..."
-    $PROGRAM_PATH &
-}
-
-# Function to stop the service
-stop() {
-    echo "Stopping $SERVICE_DESC..."
-    killall -9 host_analyzer
-}
-
 # Create the service script
 create_service_script() {
     echo "Creating service script..."
@@ -36,6 +24,18 @@ create_service_script() {
 # Short-Description: $SERVICE_DESC
 # Description:       $SERVICE_DESC
 ### END INIT INFO
+
+# Function to start the service
+start() {
+    echo "Starting $SERVICE_DESC..."
+    $PROGRAM_PATH &
+}
+
+# Function to stop the service
+stop() {
+    echo "Stopping $SERVICE_DESC..."
+    killall -9 host_analyzer
+}
 
 case "\$1" in
     start)
@@ -68,8 +68,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 if [ -f "$SERVICE_SCRIPT" ]; then
-    echo "Service script already exists."
+    echo "$SERVICE_SCRIPT Service script already exists."
 else
     create_service_script
-    echo "Service script created successfully."
+    echo "$SERVICE_SCRIPT Service script created successfully."
 fi
