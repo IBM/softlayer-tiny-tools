@@ -34,6 +34,7 @@ install_host_analyzer() {
     AM_COLLECTOR_ENDPOINT=$API_ENDPOINT
     ./check_env.sh AM_COLLECTOR_ENDPOINT "https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector"
     ./check_env.sh SCHEDULE "@dailydefault" 
+    ./check_env.sh ACCESS_KEY $ACCESS_KEY
     ./create_host_analyzer_service.sh
     service host_analyzer start
     service host_analyzer enable
