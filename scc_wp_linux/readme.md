@@ -8,5 +8,7 @@ export TAGS=<your-tag-with-format-"setup:test,os:centos6,project:roe,location:us
 
 ### install 
 yum update
-yum install psmisc
+yum install -y git psmisc
+git clone https://github.com/IBM/softlayer-tiny-tools.git
+cd softlayer-tiny-tools/scc_wp_linux/
 ./install.sh

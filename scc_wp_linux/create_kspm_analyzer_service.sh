@@ -73,7 +73,6 @@ exit 0
 EOF
 
     chmod +x $SERVICE_SCRIPT
-    update-rc.d $SERVICE_NAME defaults
 }
 
 # Main script logic

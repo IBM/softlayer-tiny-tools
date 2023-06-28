@@ -30,7 +30,7 @@ install_host_analyzer() {
     echo "start install host analyzer...."
     cp ./host_analyzer /usr/bin/
     chmod +x /usr/bin/host_analyzer
-    ./check_env.sh API_ENDPOINT "https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector" /etc/host_analyzer.env
+    ./check_env.sh AM_COLLECTOR_ENDPOINT "https://$API_ENDPOINT/internal/scanning/scanning-analysis-collector" /etc/host_analyzer.env
     ./check_env.sh SCHEDULE "@dailydefault"  /etc/host_analyzer.env
     ./check_env.sh ACCESS_KEY $ACCESS_KEY /etc/host_analyzer.env
     ./create_host_analyzer_service.sh
