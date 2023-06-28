@@ -46,18 +46,30 @@ install_host_analyzer() {
 }
 
 # Check or install agent service
-if pgrep -x "dragent" >/dev/null; then
-    echo "The service 'dragent' is running. skip install"
-else
+DRAGENT_SERVICE_SCRIPT="/etc/init.d/dragent"
+if [ -f $DRAGENT_SERVICE_SCRIPT ]; then
+    echo "$DRAGENT_SERVICE_SCRIPT Service script already exists."
+    if pgrep -x "dragent" >/dev/null; then
+        echo "The service 'dragent' is running. skip install"
+    else
+        service dragent start
+    fi
+else 
     install_agent
-fi
+fi 
 
 # Check or install host_analyzer service
-if pgrep -x "host_analyzer" >/dev/null; then
-    echo "The service 'host_analyzer' is running. skip install"
-else
+HOST_ANALYZER_SERVICE_SCRIPT="/etc/init.d/host_analyzer"
+if [ -f "/etc/init.d/HOST_ANALYZER_SERVICE_SCRIPT" ]; then
+    echo "$HOST_ANALYZER_SERVICE_SCRIPT Service script already exists."
+    if pgrep -x "host_analyzer" >/dev/null; then
+        echo "The service 'host_analyzer' is running. skip install"
+    else
+        service host_analyzer start
+    fi
+else 
     install_host_analyzer
-fi
+fi 
 
 
 
