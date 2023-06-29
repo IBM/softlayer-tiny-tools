@@ -1,0 +1,19 @@
+translate-api-username: "apikey"
+translate-api-key: 
+translate-service-endpoint: 
+mail-check-interval: 60
+ticket-notification-users:
+  # AIHelp account
+  - apikey: 
+    apikey-username: "apikey"
+    account: 1009403
+    account-id: 
+    priority:  3
+    oas:
+      - oa-type: dingding
+        oa-send-endpoint: 
+        oa-secret: 
+      - oa-type: feishu
+        oa-send-endpoint:
+
+

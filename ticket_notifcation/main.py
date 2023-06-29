@@ -4,107 +4,116 @@ import softlayer_service
 import feishu
 import translate
 import logging
-import gmail
-import re
 import yaml
 import dingding
 import mind
 import time 
-
-from urllib.parse import parse_qs
+import datetime
+from datetime import datetime, timedelta, timezone
 
 def load_yaml_config(filename):
     with open(filename, 'r') as f:
         config = yaml.safe_load(f)
     return config
 
-def build_config_map(config):
-    account_map = {}
-    for user in config["ticket-notification-users"]:
-        account_map[user["account-id"]] = user
-    return account_map
 
 def main():
-    config = load_yaml_config("config.yaml")
+    # set log level 
+    logging.basicConfig(level=logging.DEBUG)
+    global_tickets = {}
+    #load config
+    config = load_yaml_config("./config/config.yaml")
+    #config = load_yaml_config("config.yaml")
+    translate_service = translate.Translate(config["translate-api-key"], config["translate-service-endpoint"])
+    notification_users = config["ticket-notification-users"]
+    for user in notification_users:
+        global_tickets[user["account"]] = {}
     
     while True:
         try:
-            # set log level 
-            logging.basicConfig(level=logging.INFO)
-            account_map = build_config_map(config)
-            translate_service = translate.Translate(config["translate-api-key"], config["translate-service-endpoint"])
-
-            token_path = "token.json"
-            credentials_path = 'credentials.json'
-            links = gmail.get_mail_links(token_path, credentials_path)
-            parsed_mail_tickets = []
-            for link in links: 
-                url = gmail.parse_url(link)
-                if url["Netloc"] == "cloud.ibm.com" and "/cases/manage" in url["Path"]:
-                    match = re.search(r'\/(\w+)$', url["Path"])
-                    service_now_id= ""
-                    if match:
-                        service_now_id = match.group(1)
-
-                    query_params = parse_qs(url["Query"])
-                    account_id = query_params.get('accountId', [''])[0]
-                    logging.info("account ID: {}".format(account_id))
-                    logging.info("service_now_id: {}".format(service_now_id))
-                    parsed_mail_tickets.append({"account_id" :account_id, "service_now_id": service_now_id, "link": link})
-            
-            logging.debug(parsed_mail_tickets)
-            
-            for mail_ticket in parsed_mail_tickets:
-                if mail_ticket["account_id"] not in account_map:
-                    logging.info("can not find account id ,{},in config yaml fail.".format[mail_ticket["account_id"]])
-                    continue
-            
-                config_accounts_map = account_map[mail_ticket["account_id"]]
-
-                # list all of opened ticket from sl
-                account_short_id = config_accounts_map["account"]
-                print(config_accounts_map["apikey"])
-                sl_service = softlayer_service.SL_Service(account_short_id, config_accounts_map["apikey-username"], config_accounts_map["apikey"])
+            for notification_user in notification_users:
+                # list all of opened ticket from sl base on account
+                account_id = notification_user["account"]
+                account_long_id= notification_user["account-id"]
+                predefined_priority = notification_user["priority"]
+                sl_service = softlayer_service.SL_Service(account_id, notification_user["apikey-username"], notification_user["apikey"])
                 sl_tickets = sl_service.get_tickets()
-                logging.info("find opened tickets {} for account {}".format(len(sl_tickets), account_short_id))
+                logging.info("find opened tickets {} for account {}".format(len(sl_tickets), account_id))
 
                 for sl_ticket in sl_tickets:
-                    cs_ticket_Id = sl_ticket["serviceProviderResourceId"]
-                    if cs_ticket_Id == mail_ticket["service_now_id"]:
-                        title = sl_ticket["title"]
-                        priority = sl_ticket["priority"]
-                        if priority <= config_accounts_map["priority"]:
-                            lastDate = sl_ticket["lastUpdate"]["createDate"]
-                            entry = sl_ticket["lastUpdate"]["entry"]
-                            logging.info("call translate function for ticket {}".format(cs_ticket_Id))
-                            entry_translate = translate_service.translateToChinese(entry)
-                            entry_translate = entry_translate["translations"][0]["translation"]
-                            call_oa(config_accounts_map["oa"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket["link"], entry_translate)
+                    ticket_id = sl_ticket["id"]
+                    if "lastUpdate" not in sl_ticket:
+                        logging.warning("ticket {} not have lastUpdate field, skip it.".format(ticket_id))
+                        continue
+                    ticket_last_update = sl_ticket["lastUpdate"]["createDate"]
+                    ticket_priority = sl_ticket["priority"]
+                    ticket_title = sl_ticket["title"]
+                    ticket_cs_id = sl_ticket["serviceProviderResourceId"]
+                    ticket_link = "https://cloud.ibm.com/unifiedsupport/cases/manage/{}?accountId={}".format(ticket_cs_id, account_long_id)
+                    if ticket_priority <= predefined_priority:
+                        if ticket_id not in global_tickets[account_id]:
+                            logging.info("find a new ticket {} : {}".format(ticket_id, ticket_cs_id))
+                            dt = datetime.fromisoformat(ticket_last_update)
+
+                            local_time = datetime.now(timezone.utc).astimezone()
+                            # 或者使用下面这行代码代替上面一行代码
+                            # local_time = datetime.now(timezone.utc).replace(tzinfo=None)
+                            time_diff = local_time - dt
+                            logging.info("new ticket {} : {} last update time is {}, local time is {}".format(ticket_id, ticket_cs_id, dt, local_time))
+                            if time_diff < timedelta(days=2):
+                                entry = sl_ticket["lastUpdate"]["entry"]
+                                logging.info("call translate function for ticket {} : {}".format(ticket_id, ticket_cs_id))
+                                entry_translate = translate_service.translateToChinese(entry)
+                                entry_translate = entry_translate["translations"][0]["translation"]
+                                # send notification
+                                for oa in notification_user["oas"]:
+                                    call_oa(oa, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
+                                global_tickets[account_id][ticket_id] = sl_ticket
+                            else:
+                                logging.info("new ticket {} : {} last update {} is more than 2 days old, skip notification".format(ticket_id, ticket_cs_id, ticket_last_update))
                         else:
-                            logging.info("ticket: {} priority {} less than set priority {}, skip notification".format(cs_ticket_Id, priority, config_accounts_map["priority"]))
-                        break
+                            logging.info("the ticket {} : {} is not new, check last update".format(ticket_id, ticket_cs_id))
+                            # compare times
+                            previous_ticket_last_update = global_tickets[account_id][ticket_id]["lastUpdate"]["createDate"]
+                            time1 = datetime.fromisoformat(previous_ticket_last_update)
+                            time2 = datetime.fromisoformat(ticket_last_update)
+
+                            if time1 < time2:
+                                logging.info
+                                # 工单已经被更新，发送通知
+                                entry = sl_ticket["lastUpdate"]["entry"]
+                                logging.info("call translate function for ticket {} : {}".format(ticket_id, ticket_cs_id))
+                                entry_translate = translate_service.translateToChinese(entry)
+                                entry_translate = entry_translate["translations"][0]["translation"]
+                                for oa in notification_user["oas"]:
+                                    call_oa(oa, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
+                                global_tickets[account_id][ticket_id] = sl_ticket
+                            else:
+                                logging.info("ticket {} : {} is not update".format(ticket_id, ticket_cs_id))
+                    else:
+                        logging.info("ticket: {} : {} priority {} less than set priority {}, skip notification".format(ticket_id, ticket_cs_id, ticket_priority, predefined_priority))
+            interval = config["mail-check-interval"]
+            logging.info("sleep {}...".format(interval))
+            time.sleep(interval)
         except Exception as e:
             logging.error(e)
-        interval = config["mail-check-interval"]
-        logging.info("sleep {}...".format(interval))
-        time.sleep(interval)
 
-def call_oa(oa, title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
+
+def call_oa(oa, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
     oa_type = oa["oa-type"]
     if oa_type == "feishu":
-        logging.info("call feishu OI to notification for ticket: {}".format(cs_ticket_Id))
+        logging.info("call feishu OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))
         feishu_service = feishu.Lark()
         feishu_service.build_ticket_message_body(title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
         feishu_service.send(oa["oa-send-endpoint"])
     elif oa_type == "dingding":
-        logging.info("call dingding OI to notification for ticket: {}".format(cs_ticket_Id))
+        logging.info("call dingding OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))
         dingding.push_message(oa["oa-secret"], oa["oa-send-endpoint"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
     elif oa_type == "mind":
-        logging.info("call mind OI to notification for ticket: {}".format(cs_ticket_Id))
+        logging.info("call mind OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))
         mind.push_message(oa["oa-send-endpoint"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
     else:
         logging.info("unsupported OA type, pls contact: {}".format("spark.liu@cn.ibm.com"))
 
 if __name__ == '__main__':
-    #function_requests("","")
     main()
