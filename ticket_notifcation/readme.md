@@ -8,5 +8,5 @@
 ```sh
  docker run  \
  -d -v /{宿主机目录}:/usr/src/app/config \
- ticket_notifcation:v3
+ sparkliu222/softlayer_ticket_notification:v1
 ```
