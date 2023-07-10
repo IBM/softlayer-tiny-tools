@@ -33,6 +33,7 @@ def main():
         try:
             for notification_user in notification_users:
                 # list all of opened ticket from sl base on account
+                keywords = notification_user["keywords"]
                 account_id = notification_user["account"]
                 account_long_id= notification_user["account-id"]
                 predefined_priority = notification_user["priority"]
@@ -49,6 +50,11 @@ def main():
                     ticket_priority = sl_ticket["priority"]
                     ticket_title = sl_ticket["title"]
                     ticket_cs_id = sl_ticket["serviceProviderResourceId"]
+                    logging.debug(ticket_title)
+                    if not check_title(keywords, ticket_title):
+                        logging.info("ticket {} not in keywords {} and skip it.".format(ticket_cs_id, keywords))
+                        continue
+                    logging.info("ticket {} keywords check passed".format(ticket_cs_id))
                     ticket_link = "https://cloud.ibm.com/unifiedsupport/cases/manage/{}?accountId={}".format(ticket_cs_id, account_long_id)
                     if ticket_priority <= predefined_priority:
                         if ticket_id not in global_tickets[account_id]:
@@ -114,6 +120,16 @@ def call_oa(oa, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_
         mind.push_message(oa["oa-send-endpoint"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
     else:
         logging.info("unsupported OA type, pls contact: {}".format("spark.liu@cn.ibm.com"))
+
+def check_title(keywords, title):
+    if len(keywords) == 0 :
+        return True
+    for keyword in keywords:
+        if keyword.lower() in title.lower(): 
+            return True
+    return False
+
+
 
 if __name__ == '__main__':
     main()

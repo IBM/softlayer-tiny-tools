@@ -9,6 +9,7 @@ ticket-notification-users:
     account: 1009403
     account-id: 
     priority:  3
+    keywords: []
     oas:
       - oa-type: dingding
         oa-send-endpoint: 
