@@ -33,12 +33,15 @@ class Lark():
             }
         }
 
-    def build_ticket_message_body(self,title, priority, ticketId, lastDate, entry, url, entry_translate):
+    def build_ticket_message_body(self, account_id, account_name, title, priority, ticketId, cs_ticketId,lastDate, entry, url, entry_translate):
         self.ticket_template["card"]["header"] = self.get_header(title, priority)
         elements =  self.ticket_template["card"]["elements"]
 
+        elements.append(self.wrapElement("account_id", account_id))
+        elements.append(self.wrapElement("account_name", account_name))
         elements.append(self.wrapElement("优先级", priority))
-        elements.append(self.wrapElement("工单号", "[{}]({})".format(ticketId, url)))
+        elements.append(self.wrapElement("工单号", "[{}]({})".format(cs_ticketId, url)))
+        elements.append(self.wrapElement("IMS", "[{}]({})".format(ticketId, "https://internal.softlayer.com/Ticket/ticketEdit/{}".format(ticketId))))
         # elements.append(self.get_link(ticketId, url))
         elements.append(self.wrapElement("更新日期", lastDate))
         elements.append(self.wrapElement("原始内容", entry))

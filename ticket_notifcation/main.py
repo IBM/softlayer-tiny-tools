@@ -50,7 +50,9 @@ def main():
                     ticket_priority = sl_ticket["priority"]
                     ticket_title = sl_ticket["title"]
                     ticket_cs_id = sl_ticket["serviceProviderResourceId"]
+                    account_name = sl_ticket["account"]["companyName"]
                     logging.debug(ticket_title)
+
                     if not check_title(keywords, ticket_title):
                         logging.info("ticket {} not in keywords {} and skip it.".format(ticket_cs_id, keywords))
                         continue
@@ -73,7 +75,7 @@ def main():
                                 entry_translate = entry_translate["translations"][0]["translation"]
                                 # send notification
                                 for oa in notification_user["oas"]:
-                                    call_oa(oa, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
+                                    call_oa(oa, account_id, account_name, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
                                 global_tickets[account_id][ticket_id] = sl_ticket
                             else:
                                 logging.info("new ticket {} : {} last update {} is more than 2 days old, skip notification".format(ticket_id, ticket_cs_id, ticket_last_update))
@@ -92,7 +94,7 @@ def main():
                                 entry_translate = translate_service.translateToChinese(entry)
                                 entry_translate = entry_translate["translations"][0]["translation"]
                                 for oa in notification_user["oas"]:
-                                    call_oa(oa, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
+                                    call_oa(oa,account_id, account_name, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
                                 global_tickets[account_id][ticket_id] = sl_ticket
                             else:
                                 logging.info("ticket {} : {} is not update".format(ticket_id, ticket_cs_id))
@@ -105,12 +107,12 @@ def main():
             logging.error(e)
 
 
-def call_oa(oa, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
+def call_oa(oa, account_id, account_name, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
     oa_type = oa["oa-type"]
     if oa_type == "feishu":
         logging.info("call feishu OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))
         feishu_service = feishu.Lark()
-        feishu_service.build_ticket_message_body(title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
+        feishu_service.build_ticket_message_body(account_id, account_name, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
         feishu_service.send(oa["oa-send-endpoint"])
     elif oa_type == "dingding":
         logging.info("call dingding OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))

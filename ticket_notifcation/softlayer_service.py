@@ -16,7 +16,7 @@ class SL_Service():
             print(self.client.transport.print_reproduceable(call))
 
     def get_tickets(self):
-        mask = "mask[accountId, createDate, id, lastEditDate, lastEditType, lastResponseDate, modifyDate, priority, serviceProviderResourceId, status, title, totalUpdateCount, userEditableFlag, lastUpdate]"
+        mask = "mask[accountId, createDate, id, lastEditDate, lastEditType, lastResponseDate, modifyDate, priority, serviceProviderResourceId, status, title, totalUpdateCount, userEditableFlag, lastUpdate, account[companyName]]"
         return self.account_service.getOpenTickets(self.account_id, mask=mask)
 
 if __name__ == "__main__":
