@@ -58,7 +58,7 @@ class SL_Service():
         #  items[laborAfterTaxAmount, laborFee, laborFeeTaxRate, laborTaxAmount, notes, oneTimeAfterTaxAmount, oneTimeFee, oneTimeFeeTaxRate, oneTimeTaxAmount, parentId, productItemId, recurringAfterTaxAmount, recurringFee, #recurringFeeTaxRate, recurringTaxAmount, resourceTableId, serviceProviderId, setupAfterTaxAmount
         #objectMask = "mask[id, createDate, typeCode, amount, invoiceTotalAmount, invoiceTotalOneTimeAmount, invoiceTotalOneTimeTaxAmount, invoiceTotalPreTaxAmount, invoiceTotalRecurringAmount, invoiceTotalRecurringTaxAmount, payment, startingBalance, endingBalance, items[billingItemId, categoryCode, createDate, description, domainName, hostName, hourlyRecurringFee, id, invoiceId, recurringFeeTaxRate, recurringTaxAmount, resourceTableId, serviceProviderId, setupAfterTaxAmount]]"
      #   objectMask = "mask[id, accountId, createDate, typeCode, amount, items[associatedInvoiceItemId, oneTimeFee, billingItemId, categoryCode, description, domainName, hostName, id, invoiceId, parentId, recurringFee, resourceTableId]]"
-        objectMask = "mask[id, accountId, createDate, typeCode, amount, items[associatedInvoiceItemId, billingItemId, categoryCode, oneTimeFee, description, domainName, hostName, id, invoiceId, parentId, recurringFee, resourceTableId]]"
+        objectMask = "mask[id, accountId, createDate, typeCode, amount, items[associatedInvoiceItemId, billingItemId, categoryCode, oneTimeFee, description, domainName, hostName, id, invoiceId, parentId, recurringFee, resourceTableId, notes]]"
   
         objectFilter = {
             'invoices': {
