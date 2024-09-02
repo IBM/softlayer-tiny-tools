@@ -1,5 +1,4 @@
- 
- # 工单推送服务
+ # webhook推送服务
 
  - cp ./conf-template.yaml  to /{宿主机目录}/config.yaml
  - 编辑 配置文件 /{宿主机目录}/config.yaml

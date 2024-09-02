@@ -1,0 +1,6 @@
+beautifulsoup4==4.12.2
+bs4==0.0.1
+httplib2==0.22.0
+PyYAML==6.0
+requests==2.27.1
+Flask==2.2.2
