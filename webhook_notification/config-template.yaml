@@ -1,0 +1,12 @@
+port: 5001
+notification-users:
+  - account: xxxx
+    account-id: xxxxx
+    oas:
+      - oa-type: feishu
+        oa-send-endpoint: "xxxxx"
+  - account: xxxx
+    account-id: xxxx
+    oas:
+      - oa-type: feishu
+        oa-send-endpoint: "xxxx"
