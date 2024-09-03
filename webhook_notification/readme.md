@@ -5,7 +5,8 @@
  - 运行命令下列命令
 
 ```sh
+docker pull sparkliu222/softlayer_webhook_notification:v1.6
  docker run  \
  -d -v /{宿主机目录}:/usr/src/app/config \
- sparkliu222/softlayer_webhook_notification:v1.1
+sparkliu222/softlayer_webhook_notification:v1.6
 ```

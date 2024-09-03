@@ -62,7 +62,7 @@ def webhook():
         startTime,
         endTime,
         updateTime)
-    for oa in notification_user["oas"]:
+    for oa in feishu_endpoints:
         feishu_endpoint = oa["oa-send-endpoint"]
         feishu_service.send(feishu_endpoint)
 
