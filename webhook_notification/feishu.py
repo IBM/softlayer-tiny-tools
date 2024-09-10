@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime, timezone, timedelta
 
 card_title_style = ("red","yellow","blue","green")
 
@@ -85,9 +86,9 @@ class Lark():
         self.add_element(elements, "source_ID", sourceID)
         self.add_element(elements, "category", category)
         self.add_element(elements, "sub_category", subCategory)
-        self.add_element(elements, "start_time", startTime)
-        self.add_element(elements, "end_time", endTime)
-        self.add_element(elements, "update_time", updateTime)
+        self.add_element(elements, "start_time", self.convert_to_beijing_time(startTime))
+        self.add_element(elements, "end_time", self.convert_to_beijing_time(endTime))
+        self.add_element(elements, "update_time", self.convert_to_beijing_time(updateTime))
 
 
     def add_element(self, elements, key, content):
@@ -109,6 +110,15 @@ class Lark():
             header["template"]= card_title_style[priority-1]
     
         return header
+
+    def convert_to_beijing_time(self, timestamp):
+        if timestamp == None :
+             return None
+        # 转换为 UTC 时间
+        utc_time = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        # 将 UTC 时间转换为北京时间 (UTC+8)
+        beijing_time = utc_time + timedelta(hours=8)
+        return beijing_time
     
     def send(self, url):
         # 将数据转换为JSON格式

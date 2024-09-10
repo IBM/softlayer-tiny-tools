@@ -59,7 +59,7 @@ class SL_Service():
                         "operation": "not null"
                 }
             }
-            objectMask = 'mask[hostname, id, bareMetalInstanceFlag, bandwidthAllotmentDetail[bandwidthAllotmentId]， virtualRackId， virtualRackName]'
+            objectMask = 'mask[hostname, id, bareMetalInstanceFlag, bandwidthAllotmentDetail[bandwidthAllotmentId], virtualRackId, virtualRackName]'
             devices = self.account_service.getHardware(mask=objectMask, filter=objectFilterBms)
             return devices 
         except SoftLayer.SoftLayerAPIError as e:
