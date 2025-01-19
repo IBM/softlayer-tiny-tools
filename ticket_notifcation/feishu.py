@@ -33,7 +33,7 @@ class Lark():
             }
         }
 
-    def build_ticket_message_body(self, account_id, account_name, title, priority, ticketId, cs_ticketId,lastDate, entry, url, entry_translate):
+    def build_ticket_message_body(self, account_id, account_name, title, priority, ticketId, cs_ticketId,lastDate, entry, url):
         self.ticket_template["card"]["header"] = self.get_header(title, priority)
         elements =  self.ticket_template["card"]["elements"]
 
@@ -44,13 +44,52 @@ class Lark():
         elements.append(self.wrapElement("IMS", "[{}]({})".format(ticketId, "https://internal.softlayer.com/Ticket/ticketEdit/{}".format(ticketId))))
         # elements.append(self.get_link(ticketId, url))
         elements.append(self.wrapElement("更新日期", lastDate))
-        elements.append(self.wrapElement("原始内容", entry))
-        elements.append(self.wrapElement("翻文", entry_translate))
-        elements.append(
-            self.wrapElement("备注",
-            "翻译由 [Ibm watson language translator]({}) 提供 ".format("https://www.ibm.com/cloud/watson-language-translator")
-                             )
-            )
+        elements.append(self.wrapElement("内容", entry))
+    
+    def build_notifcation_body(self,
+        title,
+        priority,
+        accountID,
+        accountShortID,
+        body,
+        state,
+        severity,
+        componentNames,
+        continentNames, 
+        regionNames,
+        regions,
+        sourceID,
+        category, 
+        subCategory,
+        startTime,
+        endTime,
+        updateTime):
+        self.ticket_template["card"]["header"] = self.get_header(title, priority)
+        elements =  self.ticket_template["card"]["elements"]
+
+        self.add_element(elements, "account_id", accountID)
+        self.add_element(elements, "account", accountShortID)
+        self.add_element(elements, "content", body)
+        self.add_element(elements, "state", state)
+        self.add_element(elements, "severity", severity)
+        self.add_element(elements, "component_names", componentNames)
+        self.add_element(elements, "continent_names", continentNames)
+        self.add_element(elements, "region_names", regionNames)
+        self.add_element(elements, "regions", regions)
+        self.add_element(elements, "source_ID", sourceID)
+        self.add_element(elements, "category", category)
+        self.add_element(elements, "sub_category", subCategory)
+        self.add_element(elements, "start_time", startTime)
+        self.add_element(elements, "end_time", endTime)
+        self.add_element(elements, "update_time", updateTime)
+
+
+    def add_element(self, elements, key, content):
+        if isinstance(content, list):
+            content = ", ".join(content)
+        if content:
+            elements.append(self.wrapElement(key, content))
+
 
     def get_header(self, title, priority):
         header ={
@@ -68,6 +107,7 @@ class Lark():
     def send(self, url):
         # 将数据转换为JSON格式
         json_data = json.dumps(self.ticket_template)
+        print(json_data)
         # 发送POST请求，将JSON数据发送到指定端点
         post_headers = {'Content-Type': 'application/json'}
         response = requests.post(url, data=json_data, headers=post_headers)

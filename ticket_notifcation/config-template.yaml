@@ -1,7 +1,5 @@
-translate-api-username: "apikey"
-translate-api-key: 
-translate-service-endpoint: 
 mail-check-interval: 60
+ibm_internal: false
 ticket-notification-users:
   # AIHelp account
   - apikey: 

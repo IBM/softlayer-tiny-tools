@@ -24,7 +24,6 @@ def main():
     #load config
     config = load_yaml_config("./config/config.yaml")
     #config = load_yaml_config("config.yaml")
-    translate_service = translate.Translate(config["translate-api-key"], config["translate-service-endpoint"])
     notification_users = config["ticket-notification-users"]
     for user in notification_users:
         global_tickets[user["account"]] = {}
@@ -70,12 +69,9 @@ def main():
                             logging.info("new ticket {} : {} last update time is {}, local time is {}".format(ticket_id, ticket_cs_id, dt, local_time))
                             if time_diff < timedelta(days=2):
                                 entry = sl_ticket["lastUpdate"]["entry"]
-                                logging.info("call translate function for ticket {} : {}".format(ticket_id, ticket_cs_id))
-                                entry_translate = translate_service.translateToChinese(entry)
-                                entry_translate = entry_translate["translations"][0]["translation"]
                                 # send notification
                                 for oa in notification_user["oas"]:
-                                    call_oa(oa, account_id, account_name, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
+                                    call_oa(oa, account_id, account_name, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link)
                                 global_tickets[account_id][ticket_id] = sl_ticket
                             else:
                                 logging.info("new ticket {} : {} last update {} is more than 2 days old, skip notification".format(ticket_id, ticket_cs_id, ticket_last_update))
@@ -90,11 +86,8 @@ def main():
                                 logging.info
                                 # 工单已经被更新，发送通知
                                 entry = sl_ticket["lastUpdate"]["entry"]
-                                logging.info("call translate function for ticket {} : {}".format(ticket_id, ticket_cs_id))
-                                entry_translate = translate_service.translateToChinese(entry)
-                                entry_translate = entry_translate["translations"][0]["translation"]
                                 for oa in notification_user["oas"]:
-                                    call_oa(oa,account_id, account_name, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link, entry_translate)
+                                    call_oa(oa,account_id, account_name, ticket_title, ticket_priority, ticket_id, ticket_cs_id, ticket_last_update, entry, ticket_link)
                                 global_tickets[account_id][ticket_id] = sl_ticket
                             else:
                                 logging.info("ticket {} : {} is not update".format(ticket_id, ticket_cs_id))
@@ -107,19 +100,19 @@ def main():
             logging.error(e)
 
 
-def call_oa(oa, account_id, account_name, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
+def call_oa(oa, account_id, account_name, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link):
     oa_type = oa["oa-type"]
     if oa_type == "feishu":
         logging.info("call feishu OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))
         feishu_service = feishu.Lark()
-        feishu_service.build_ticket_message_body(account_id, account_name, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
+        feishu_service.build_ticket_message_body(account_id, account_name, title, priority, ticket_id, cs_ticket_Id, lastDate, entry, mail_ticket_link)
         feishu_service.send(oa["oa-send-endpoint"])
     elif oa_type == "dingding":
         logging.info("call dingding OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))
-        dingding.push_message(oa["oa-secret"], oa["oa-send-endpoint"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
+        dingding.push_message(oa["oa-secret"], oa["oa-send-endpoint"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link)
     elif oa_type == "mind":
         logging.info("call mind OI to notification for ticket {} : {}".format(ticket_id, cs_ticket_Id))
-        mind.push_message(oa["oa-send-endpoint"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate)
+        mind.push_message(oa["oa-send-endpoint"], title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link)
     else:
         logging.info("unsupported OA type, pls contact: {}".format("spark.liu@cn.ibm.com"))
 

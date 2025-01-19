@@ -16,7 +16,7 @@ def get_sign(secret):
     sign = urllib.parse.quote_plus(base64.b64encode(hmac_code))
     return timestamp, sign
 
-def push_message(secret, endpoint, title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link, entry_translate):
+def push_message(secret, endpoint, title, priority, cs_ticket_Id, lastDate, entry, mail_ticket_link):
     logging.info("ding ding send msg for ticket {}".format(cs_ticket_Id))
     post_headers = {'Content-Type': 'application/json'}
     data = {
@@ -28,10 +28,7 @@ def push_message(secret, endpoint, title, priority, cs_ticket_Id, lastDate, entr
             "> ### 工单跳转: [{}]({}) \n".format(cs_ticket_Id, mail_ticket_link) +
             "> ### 更新日期: {}\n\n".format(lastDate) +
             "> ### 最新更新: \n\n\n" +
-            "> #### {}\n\n\n".format(entry) +
-            "> ### 译文: \n\n\n" +
-            "> ####  {}\n\n\n".format(entry_translate) +
-            "> ### 翻译由 [Ibm watson language translator]({}) 提供 ".format("https://www.ibm.com/cloud/watson-language-translator")
+            "> #### {}\n\n\n".format(entry)
             }
     }
     timestamp, sign = get_sign(secret)
