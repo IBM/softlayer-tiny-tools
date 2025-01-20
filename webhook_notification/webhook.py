@@ -64,6 +64,7 @@ def webhook():
         updateTime)
     for oa in feishu_endpoints:
         feishu_endpoint = oa["oa-send-endpoint"]
+        logging.info(feishu_endpoint)
         feishu_service.send(feishu_endpoint)
 
     # Return a response
