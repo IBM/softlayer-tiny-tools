@@ -80,11 +80,14 @@ class Lark():
     
         return header
 
-    def convert_to_beijing_time(self, timestamp):
-        if timestamp == None :
+    def convert_to_beijing_time(self, unix_time):
+        if unix_time == None :
              return None
-        # 转换为 UTC 时间
-        utc_time = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        # 判断时间戳的位数，13位通常是毫秒，10位通常是秒
+        if len(str(int(unix_time))) == 13:
+            unix_time = unix_time / 1000
+        # 将 Unix 时间戳转换为 datetime 对象
+        utc_time = datetime.fromtimestamp(unix_time, tz=timezone.utc)
         # 将 UTC 时间转换为北京时间 (UTC+8)
         beijing_time = utc_time + timedelta(hours=8)
         return beijing_time
