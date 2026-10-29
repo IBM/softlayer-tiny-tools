@@ -1,6 +1,6 @@
 beautifulsoup4==4.12.2
 bs4==0.0.1
-httplib2==0.22.0
+httplib2==0.32.0
 ibm-cloud-sdk-core==3.16.2
 ibm-watson==7.0.0
 PyYAML==6.0
