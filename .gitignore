@@ -1,1 +1,3 @@
 debug/
+vmware_tools/myenv
+.env.sh

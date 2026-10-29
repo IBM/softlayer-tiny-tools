@@ -18,24 +18,28 @@ suffix = ''
 domain = ''
 private_vlan = None
 public_vlan = None
+private_subnet = None
+public_subnet = None
 extendedHardwareTesting = False
+verify = False
+list_subnets = None
 
 
 try:
     opts, args = getopt.getopt(
         sys.argv[1:],
         "",
-        ["quote_id=", "ext_test=", "quantity=", "provisionScripts=", "prefix=", "index=", "suffix=", "domain=", "private_vlan=", "public_vlan="],
+        ["quote_id=", "ext_test=", "quantity=", "provisionScripts=", "prefix=", "index=", "suffix=", "domain=", "private_vlan=", "public_vlan=", "private_subnet=", "public_subnet=", "verify=", "list_subnets="],
         )
 except getopt.GetoptError:
     print("example:")
-    print('         %s --quote_id=2987038 --ext_test=true --quantity=2 --provisionScripts="https://10.1.1.1/init.sh" --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707' % sys.argv[0])
+    print('         %s --quote_id=2987038 --ext_test=true --quantity=2 --provisionScripts="https://10.1.1.1/init.sh" --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707 [--private_subnet=1234567]' % sys.argv[0])
     print("")
     sys.exit(2)
 for opt, arg in opts:
     if opt == '-h':
         print("example:")
-        print('         %s --quote_id=2987038 --ext_test=true  --quantity=2 --provisionScripts="https://10.1.1.1/init.sh" --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707' % sys.argv[0])
+        print('         %s --quote_id=2987038 --ext_test=true  --quantity=2 --provisionScripts="https://10.1.1.1/init.sh" --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707 [--private_subnet=1234567]' % sys.argv[0])
         print("")
         sys.exit(2)
     elif opt in ("--quote_id"):
@@ -56,11 +60,19 @@ for opt, arg in opts:
         private_vlan = int(arg)
     elif opt in ("--public_vlan"):
         public_vlan = int(arg)
+    elif opt in ("--private_subnet"):
+        private_subnet = int(arg)
+    elif opt in ("--public_subnet"):
+        public_subnet = int(arg)
     elif opt in ("--ext_test="):
         if arg == "true":
             extendedHardwareTesting= True
         else: 
             extendedHardwareTesting= False
+    elif opt in ("--verify"):
+        verify = arg == "true"
+    elif opt in ("--list_subnets"):
+        list_subnets = int(arg)
 
 class example():
 
@@ -69,7 +81,7 @@ class example():
         debugger = SoftLayer.DebugTransport(self.client.transport)
         self.client.transport = debugger
 
-    def orderQuote(self, quote_id, quantity, extendedHardwareTesting=True, provisionScripts="", prefix="", index=0, suffix="", domain="", private_vlan = None, public_vlan = None):
+    def orderQuote(self, quote_id, quantity, extendedHardwareTesting=True, provisionScripts="", prefix="", index=0, suffix="", domain="", private_vlan = None, public_vlan = None, private_subnet = None, public_subnet = None, verify = False):
         # If you have more than 1 server in the quote, you will need to append
         # a copy of this for each VSI, with hostnames changed as needed
 
@@ -94,20 +106,27 @@ class example():
             }
 
             if private_vlan:
+                vlan = {"id": int(private_vlan)}
+                if private_subnet:
+                    vlan["primarySubnet"] = {"id": int(private_subnet)}
                 baremetal.update({
-                    "primaryBackendNetworkComponent": {
-                    "networkVlan": {"id": int(private_vlan)}}})
+                    "primaryBackendNetworkComponent": {"networkVlan": vlan}})
             if public_vlan:
+                vlan = {"id": int(public_vlan)}
+                if public_subnet:
+                    vlan["primarySubnet"] = {"id": int(public_subnet)}
                 baremetal.update({
-                    'primaryNetworkComponent': {
-                    "networkVlan": {"id": int(public_vlan)}}})
+                    'primaryNetworkComponent': {"networkVlan": vlan}})
                 
             container['hardware'].append(baremetal)
             if provisionScripts: 
                 container['provisionScripts'].append(provisionScripts)          
         
         pp(container)
-        # result = self.client['Billing_Order_Quote'].verifyOrder(container, id=quote_id)
+        if verify:
+            self.client['Billing_Order_Quote'].verifyOrder(container, id=quote_id)
+            print("================= 校验通过, 未实际下单 =================")
+            return
         result = self.client['Billing_Order_Quote'].placeOrder(container, id=quote_id)
         print("================= RECEIPT CONTAINER =================")
         pp(result)
@@ -162,21 +181,38 @@ class example():
         for subnet in subnets:
             print("%s, %s, %s" % ( subnet['id'], subnet['vlanNumber'], subnet['primaryRouter']['hostname']))
 
+    def listSubnetsOnVlan(self, vlan_id):
+        mask = "mask[id,vlanNumber,networkSpace,primaryRouter[hostname],subnets[id,networkIdentifier,cidr,subnetType,usableIpAddressCount]]"
+        vlan = self.client['SoftLayer_Network_Vlan'].getObject(id=vlan_id, mask=mask)
+        print("VLAN ID: %s, VLAN 号: %s, 类型: %s, 路由: %s" % (
+            vlan['id'], vlan['vlanNumber'], vlan.get('networkSpace', ''), vlan.get('primaryRouter', {}).get('hostname', '')))
+        print("子网 ID, 网段, 类型, 可用 IP 数")
+        for subnet in vlan.get('subnets', []):
+            print("%s, %s/%s, %s, %s" % (
+                subnet['id'], subnet['networkIdentifier'], subnet['cidr'],
+                subnet['subnetType'], subnet.get('usableIpAddressCount', '')))
+        print("")
+        print("下单时 --private_subnet / --public_subnet 只能使用 PRIMARY 或 ADDITIONAL_PRIMARY 类型的子网")
+
     def debug(self):
         for call in self.client.transport.get_last_calls():
             print(self.client.transport.print_reproduceable(call))
     
-    def confirm(self, quote_id, quantity, extendedHardwareTesting, provisionScripts="", prefix="", index=0, suffix="", domain="", private_vlan = None, public_vlan = None):
+    def confirm(self, quote_id, quantity, extendedHardwareTesting, provisionScripts="", prefix="", index=0, suffix="", domain="", private_vlan = None, public_vlan = None, private_subnet = None, public_subnet = None, verify = False):
         print("")
         print("请核对下列创建订单信息：")
         if private_vlan:
             print("     私有vlan ID: %d" % private_vlan)
         else:
             print("     私有vlan ID: 系统自动分配")
+        if private_subnet:
+            print("     私有子网 ID: %d" % private_subnet)
         if public_vlan:
-              print("   公有vlan ID: %d" % private_vlan)
+            print("     公有vlan ID: %d" % public_vlan)
         else:
             print("     公有vlan ID: 系统自动分配")
+        if public_subnet:
+            print("     公有子网 ID: %d" % public_subnet)
         if provisionScripts:
             print("     初始化脚本为: %s" % provisionScripts)
         if extendedHardwareTesting: 
@@ -188,9 +224,15 @@ class example():
         for x in range(quantity): 
             print("         " + prefix + str(index+x) + suffix + "." + domain)
         print("")
+        if verify:
+            print("     模式: 仅校验订单 (verifyOrder), 不会实际下单")
+            print("")
         confirm = input("是否继续(Y/N)")
         if confirm.lower() == "y":
-            print("开始下单, 请不要中断脚本.......")
+            if verify:
+                print("开始校验订单.......")
+            else:
+                print("开始下单, 请不要中断脚本.......")
         else:
             print("退出....")
             exit(2)
@@ -199,6 +241,9 @@ class example():
 if __name__ == "__main__":
     #quote_id = 2987038
     main = example()
+    if list_subnets:
+        main.listSubnetsOnVlan(list_subnets)
+        sys.exit(0)
     # main.listImageTemplates()
     # main.listQuotes()
     # main.listLocationsForQuote(quote_id)
@@ -210,6 +255,6 @@ if __name__ == "__main__":
     # # main.listVlansInLocation(dal13)
     # backend_vlan = 2068355 #951, bcr01a.dal13
     # front_vlan = 2068353 # 907, fcr01a.dal13
-    main.confirm(quote_id=quote_id, extendedHardwareTesting=extendedHardwareTesting, quantity=quantity, provisionScripts=provisionScripts, prefix=prefix, index=index, suffix=suffix, domain=domain, private_vlan=private_vlan, public_vlan=public_vlan)
-    main.orderQuote(quote_id=quote_id, extendedHardwareTesting=extendedHardwareTesting, quantity=quantity, provisionScripts=provisionScripts, prefix=prefix, index=index, suffix=suffix, domain=domain, private_vlan=private_vlan, public_vlan=public_vlan)
+    main.confirm(quote_id=quote_id, extendedHardwareTesting=extendedHardwareTesting, quantity=quantity, provisionScripts=provisionScripts, prefix=prefix, index=index, suffix=suffix, domain=domain, private_vlan=private_vlan, public_vlan=public_vlan, private_subnet=private_subnet, public_subnet=public_subnet, verify=verify)
+    main.orderQuote(quote_id=quote_id, extendedHardwareTesting=extendedHardwareTesting, quantity=quantity, provisionScripts=provisionScripts, prefix=prefix, index=index, suffix=suffix, domain=domain, private_vlan=private_vlan, public_vlan=public_vlan, private_subnet=private_subnet, public_subnet=public_subnet, verify=verify)
     # main.debug()
