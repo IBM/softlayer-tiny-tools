@@ -22,9 +22,34 @@ pip3 install SoftLayer
      ./order_by_quote.py --quote_id=2987038 --quantity=2 --ext_test=true --provisionScripts="https://10.1.1.1/init.sh" --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707
     ```
     上面这个命令将创建 2台(`--quantity=2`)物理机，  
-    两台物理机的名字分别为 `s192-dal9.test.com` 和 `s192-dal9.test.com`，  
+    两台物理机的名字分别为 `s192-dal9.test.com` 和 `s193-dal9.test.com`，  
     这些物理机的名字是由参数  `--prefix` , `--index`，`--suffix` 和 ` --domain` 四部分组合而成，  
     这些物理机使用quote 为2987038, 由 `quote_id`指定， 并且他们将在vlan 3250707 内被创建。  
+
+### 指定子网下单
+    当一个 VLAN 上有多个 Primary 子网时，可以用 `--private_subnet` / `--public_subnet` 指定服务器主 IP 从哪个子网分配。
+
+    1. 查看 VLAN 上的子网，找到要用的子网 ID（类型需为 `PRIMARY` 或 `ADDITIONAL_PRIMARY`）：
+    ```
+     ./order_by_quote.py --list_subnets=3250707
+    ```
+
+    2. 先用 `--verify=true` 校验订单，确认子网和 VLAN 匹配，此步不会实际下单：
+    ```
+     ./order_by_quote.py --quote_id=2987038 --quantity=2 --ext_test=true --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707 --private_subnet=1234567 --verify=true
+    ```
+
+    3. 校验通过后，去掉 `--verify=true` 正式下单：
+    ```
+     ./order_by_quote.py --quote_id=2987038 --quantity=2 --ext_test=true --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707 --private_subnet=1234567
+    ```
+    上面的命令会在私有 vlan 3250707 内创建 2 台物理机，内网主 IP 从子网 1234567 中分配。
+
+    同时指定公网 VLAN 和子网：
+    ```
+     ./order_by_quote.py --quote_id=2987038 --quantity=2 --prefix="s" --index=192 --suffix="-dal9" --domain="test.com" --private_vlan=3250707 --private_subnet=1234567 --public_vlan=3250705 --public_subnet=1234570
+    ```
+    注意：`--private_subnet` 必须和 `--private_vlan` 一起使用，`--public_subnet` 必须和 `--public_vlan` 一起使用，且子网必须属于对应的 VLAN。
 
 ## 参数说明
  - `quote_id`             IBM 客户经理为您设置的优惠 quote ID
